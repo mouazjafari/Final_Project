@@ -116,15 +116,15 @@
                             <span class="address-value">
                                 <select class="status-select status-{{ $order->status }}"
                                     data-order-id="{{ $order->id }}"
-                                    onchange="update_status({{ $order->id }}, this.value)">
+                                    onchange="updateOrderStatus({{ $order->id }}, this.value)">
                                     <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>
                                         ⏳ قيد الانتظار
                                     </option>
                                     <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>
                                         🔄 قيد المعالجة
                                     </option>
-                                    <option value="shipped" {{ $order->status == 'completed' ? 'selected' : '' }}>
-                                        📦 اكتمل
+                                    <option value="delivered" {{ $order->status == 'completed' ? 'selected' : '' }}>
+                                        ✅ اكتمل
                                     </option>
                                     <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>
                                         ❌ ملغي
@@ -225,4 +225,139 @@
 
 @push('scripts')
     <script src="{{ asset('js/admin-orders-scripts.js') }}"></script>
+@endpush
+@push('scripts')
+<script>
+// ==================== Update Order Status ====================
+
+function updateOrderStatus(orderId, newStatus) {
+    console.log('🔄 Updating order:', orderId, 'to status:', newStatus);
+
+    if (!confirm('هل أنت متأكد من تغيير حالة الطلب؟')) {
+        location.reload();
+        return;
+    }
+
+    const selectElement = document.querySelector(`select[data-order-id="${orderId}"]`);
+
+    if (!selectElement) {
+        console.error('❌ Select element not found for order:', orderId);
+        alert('حدث خطأ: لم يتم العثور على عنصر الاختيار');
+        return;
+    }
+
+    const originalClass = selectElement.className;
+
+    // إضافة تأثير التحميل
+    selectElement.disabled = true;
+    selectElement.style.opacity = '0.6';
+
+    // التحقق من وجود CSRF Token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) {
+        console.error('❌ CSRF token not found!');
+        alert('خطأ: CSRF Token مفقود');
+        selectElement.disabled = false;
+        selectElement.style.opacity = '1';
+        return;
+    }
+
+    console.log('📤 Sending request to:', `/admin/orders/${orderId}/status`);
+
+    fetch(`/admin/orders/${orderId}/status`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken.content,
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(response => {
+        console.log('📥 Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('✅ Response data:', data);
+
+        if (data.success) {
+            // تحديث class الـ select
+            selectElement.className = `status-select status-${newStatus}`;
+            selectElement.style.opacity = '1';
+            selectElement.disabled = false;
+
+            // تحديث data attribute
+            const card = selectElement.closest('.order-card');
+            if (card) {
+                card.dataset.status = newStatus;
+
+                // تأثير نبض على البطاقة
+                card.style.backgroundColor = '#d1fae5';
+                setTimeout(() => {
+                    card.style.backgroundColor = '';
+                }, 1000);
+            }
+
+            // إظهار رسالة نجاح
+            showSuccessMessage('✅ تم تحديث حالة الطلب بنجاح!');
+        } else {
+            console.error('❌ Update failed:', data.message);
+            showErrorMessage('❌ ' + (data.message || 'حدث خطأ أثناء تحديث الحالة'));
+            selectElement.className = originalClass;
+            selectElement.disabled = false;
+            selectElement.style.opacity = '1';
+        }
+    })
+    .catch(error => {
+        console.error('❌ Fetch error:', error);
+        showErrorMessage('❌ حدث خطأ في الاتصال بالخادم: ' + error.message);
+        selectElement.className = originalClass;
+        selectElement.disabled = false;
+        selectElement.style.opacity = '1';
+    });
+}
+
+// ==================== Success/Error Messages ====================
+
+function showSuccessMessage(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-success';
+    alertDiv.style.position = 'fixed';
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px';
+    alertDiv.style.zIndex = '99999';
+    alertDiv.style.minWidth = '300px';
+    alertDiv.innerHTML = message;
+
+    document.body.appendChild(alertDiv);
+
+    setTimeout(() => {
+        alertDiv.style.opacity = '0';
+        setTimeout(() => alertDiv.remove(), 300);
+    }, 3000);
+}
+
+function showErrorMessage(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-error';
+    alertDiv.style.position = 'fixed';
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px';
+    alertDiv.style.zIndex = '99999';
+    alertDiv.style.minWidth = '300px';
+    alertDiv.innerHTML = message;
+
+    document.body.appendChild(alertDiv);
+
+    setTimeout(() => {
+        alertDiv.style.opacity = '0';
+        setTimeout(() => alertDiv.remove(), 300);
+    }, 5000);
+}
+
+console.log('✅ Orders JavaScript loaded successfully!');
+</script>
 @endpush
