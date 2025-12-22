@@ -123,7 +123,7 @@
                                     <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>
                                         🔄 قيد المعالجة
                                     </option>
-                                    <option value="delivered" {{ $order->status == 'completed' ? 'selected' : '' }}>
+                                    <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>
                                         ✅ اكتمل
                                     </option>
                                     <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>
