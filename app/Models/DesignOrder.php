@@ -51,6 +51,6 @@ class DesignOrder extends Model
             'design_option_selected',
             'design_order_id',
             'design_option_id'
-        )->withPivot('option_name');;
+        );
     }
 }

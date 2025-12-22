@@ -15,15 +15,17 @@ class OrderController extends Controller
         $total = $orders->count();
         return view('admin.orders', compact('orders', 'total'));
     }
+
     public function show($id)
     {
         try {
+            // ✅ تحميل كل العلاقات المطلوبة
             $order = Order::with([
                 'user',
-                'address',
+                'address.city',
                 'designOrders.size',
                 'designOrders.design.images',
-                // 'designOrders.options'
+                'designOrders.options' // ✅ هون المشكلة - كان معلق
             ])->findOrFail($id);
 
             // تنسيق البيانات
@@ -39,20 +41,16 @@ class OrderController extends Controller
                 ],
                 'address' => [
                     'street' => $order->address->street ?? 'غير محدد',
-                    'city' => $order->address->city ?? 'غير محدد',
+                    'city' => $order->address->city->getTranslation('name', 'ar') ?? 'غير محدد',
                 ],
-                // 'options' => [
-                //     'name' => $order->designOrders->options->name ?? 'غير محدد',
-                //     'type' => $order->designOrders->options->type ?? 'غير محدد',
-                // ],
                 'designOrders' => []
             ];
-            dd($orderData);
 
             // معالجة التصاميم
-            if ($order->designOrders) {
+            if ($order->designOrders && $order->designOrders->count() > 0) {
                 foreach ($order->designOrders as $designOrder) {
-                    // استخراج الاسم العربي من JSON
+
+                    // ✅ استخراج الاسم العربي من JSON
                     $designName = 'غير محدد';
                     if ($designOrder->design && $designOrder->design->name) {
                         $nameData = is_string($designOrder->design->name)
@@ -66,23 +64,52 @@ class OrderController extends Controller
                         'id' => $designOrder->id,
                         'design_name' => $designName,
                         'quantity' => $designOrder->quantity ?? 0,
+                        'unit_price' => $designOrder->unit_price ?? 0, // ✅ سعر الوحدة
+                        'total_price' => ($designOrder->unit_price ?? 0) * ($designOrder->quantity ?? 0), // ✅ السعر الإجمالي
                         'size' => null,
-                        'design_images' => []
+                        'design_images' => [],
+                        'selected_options' => [] // ✅ هون راح نحط الـ options
                     ];
 
-                    // معالجة المقاس
+                    // ✅ معالجة المقاس
                     if ($designOrder->size) {
+                        $sizeName = is_string($designOrder->size->name)
+                            ? json_decode($designOrder->size->name, true)
+                            : $designOrder->size->name;
+
                         $designData['size'] = [
                             'id' => $designOrder->size->id,
-                            'name' => $designOrder->size->name
+                            'name' => is_array($sizeName)
+                                ? ($sizeName['ar'] ?? $sizeName['en'] ?? $designOrder->size->name)
+                                : $designOrder->size->name
                         ];
                     }
 
-                    // معالجة الصور
+                    // ✅ معالجة الصور
                     if ($designOrder->design && $designOrder->design->images) {
                         foreach ($designOrder->design->images as $image) {
                             $designData['design_images'][] = [
-                                'path' => $image->path
+                                'path' => $image->image_path ?? null
+                            ];
+                        }
+                    }
+
+                    // ✅ معالجة الـ Options المختارة
+                    if ($designOrder->options && $designOrder->options->count() > 0) {
+                        foreach ($designOrder->options as $option) {
+                            // فحص إذا الاسم JSON string
+                            $optionName = $option->name;
+                            if (is_string($optionName)) {
+                                $decoded = json_decode($optionName, true);
+                                if (is_array($decoded)) {
+                                    $optionName = $decoded; // خليه array
+                                }
+                            }
+
+                            $designData['selected_options'][] = [
+                                'id' => $option->id,
+                                'name' => $optionName, // هون راح يكون array مثل: ['ar' => 'أحمر', 'en' => 'Red']
+                                'type' => $option->type ?? 'غير محدد'
                             ];
                         }
                     }
@@ -99,11 +126,13 @@ class OrderController extends Controller
             return response()->json([
                 'error' => 'حدث خطأ أثناء تحميل بيانات الطلب',
                 'message' => $e->getMessage(),
-                'line' => $e->getLine()
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
             ], 500);
         }
     }
-    public function updateStatus(Request $request, $id)
+
+    public function updateStatus($id, Request $request)
     {
         try {
             $request->validate([

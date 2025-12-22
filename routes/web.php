@@ -85,6 +85,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/orders/{id}', [OrderController::class, 'show'])
             ->name('orders.show');
 
+        Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])
+            ->name('orders.updateStatus');
+
         // Logout
         Route::post('/logout', [AuthController::class, 'logout'])
             ->name('logout');

@@ -20,7 +20,7 @@
     @endif
 
     <!-- Page Header -->
-    <div class="page-header" style="background: linear-gradient(90deg, #667eea, #764ba2);">
+    <div class="page-header" style="background: linear-gradient(90deg,#2c3e50,#34495e);">
         <h2>🛒 إدارة الطلبات</h2>
         <div class="page-stats">
             <span class="stat-badge">إجمالي الطلبات: {{ $total ?? 0 }}</span>
@@ -85,12 +85,9 @@
     <!-- Orders Grid -->
     <div class="addresses-grid">
         @foreach ($orders as $order)
-            <div class="address-card order-card"
-                data-order-id="{{ $order->id }}"
-                data-user-name="{{ strtolower($order->user->name) }}"
-                data-status="{{ $order->status }}"
-                data-price="{{ $order->total_price }}"
-                data-date="{{ $order->created_at->format('Y-m-d') }}">
+            <div class="address-card order-card" data-order-id="{{ $order->id }}"
+                data-user-name="{{ strtolower($order->user->name) }}" data-status="{{ $order->status }}"
+                data-price="{{ $order->total_price }}" data-date="{{ $order->created_at->format('Y-m-d') }}">
 
                 {{-- <div class="order-image-section">
                     @if ($order->design && $order->design->images && $order->design->images->count() > 0)
@@ -114,37 +111,34 @@
 
                 <div class="address-details">
                     <span class="address-label">رقم الطلب : {{ $order->id }}</س>
-                    <div class="address-row">
-                        <span class="address-label">الحالة:</span>
-                        <span class="address-value">
-                            <select class="status-select status-{{ $order->status }}"
+                        <div class="address-row">
+                            <span class="address-label">الحالة:</span>
+                            <span class="address-value">
+                                <select class="status-select status-{{ $order->status }}"
                                     data-order-id="{{ $order->id }}"
-                                    onchange="updateOrderStatus({{ $order->id }}, this.value)">
-                                <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>
-                                    ⏳ قيد الانتظار
-                                </option>
-                                <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>
-                                    🔄 قيد المعالجة
-                                </option>
-                                <option value="shipped" {{ $order->status == 'shipped' ? 'selected' : '' }}>
-                                    📦 تم الشحن
-                                </option>
-                                <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>
-                                    ✅ تم التوصيل
-                                </option>
-                                <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>
-                                    ❌ ملغي
-                                </option>
-                            </select>
-                        </span>
-                    </div>
+                                    onchange="update_status({{ $order->id }}, this.value)">
+                                    <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>
+                                        ⏳ قيد الانتظار
+                                    </option>
+                                    <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>
+                                        🔄 قيد المعالجة
+                                    </option>
+                                    <option value="shipped" {{ $order->status == 'completed' ? 'selected' : '' }}>
+                                        📦 اكتمل
+                                    </option>
+                                    <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>
+                                        ❌ ملغي
+                                    </option>
+                                </select>
+                            </span>
+                        </div>
 
-                    <div class="address-row">
-                        <span class="address-label">الإجمالي:</span>
-                        <span class="address-value price-value">{{ number_format($order->total_price, 2) }} ₪</span>
-                    </div>
+                        <div class="address-row">
+                            <span class="address-label">الإجمالي:</span>
+                            <span class="address-value price-value">{{ number_format($order->total_price, 2) }} ₪</span>
+                        </div>
 
-                    {{-- @if($order->design)
+                        {{-- @if ($order->design)
                         <div class="address-row">
                             <span class="address-label">التصميم:</span>
                             <span class="address-value">
@@ -161,34 +155,34 @@
                         </div>
                     @endif --}}
 
-                    @if($order->size)
-                        <div class="address-row">
-                            <span class="address-label">المقاس:</span>
-                            <span class="address-value">
-                                @php
-                                    $sizeName = is_string($order->size->name)
-                                        ? json_decode($order->size->name, true)
-                                        : $order->size->name;
-                                    $displaySizeName = is_array($sizeName)
-                                        ? $sizeName['ar'] ?? ($sizeName['en'] ?? 'غير محدد')
-                                        : $order->size->name;
-                                @endphp
-                                <span class="size-badge">{{ $displaySizeName }}</span>
-                            </span>
-                        </div>
-                    @endif
+                        @if ($order->size)
+                            <div class="address-row">
+                                <span class="address-label">المقاس:</span>
+                                <span class="address-value">
+                                    @php
+                                        $sizeName = is_string($order->size->name)
+                                            ? json_decode($order->size->name, true)
+                                            : $order->size->name;
+                                        $displaySizeName = is_array($sizeName)
+                                            ? $sizeName['ar'] ?? ($sizeName['en'] ?? 'غير محدد')
+                                            : $order->size->name;
+                                    @endphp
+                                    <span class="size-badge">{{ $displaySizeName }}</span>
+                                </span>
+                            </div>
+                        @endif
 
-                    <div class="address-row">
-                        <span class="address-label">التاريخ:</span>
-                        <span class="address-value">{{ $order->created_at->format('Y-m-d H:i') }}</span>
-                    </div>
-
-                    @if($order->notes)
                         <div class="address-row">
-                            <span class="address-label">ملاحظات:</span>
-                            <span class="address-value notes-text">{{ Str::limit($order->notes, 50) }}</span>
+                            <span class="address-label">التاريخ:</span>
+                            <span class="address-value">{{ $order->created_at->format('Y-m-d H:i') }}</span>
                         </div>
-                    @endif
+
+                        @if ($order->notes)
+                            <div class="address-row">
+                                <span class="address-label">ملاحظات:</span>
+                                <span class="address-value notes-text">{{ Str::limit($order->notes, 50) }}</span>
+                            </div>
+                        @endif
                 </div>
 
                 <div class="card-actions">

@@ -122,7 +122,7 @@ class OrderService
                 $order->total_price += $design->price * $data['quantity'];
                 $order->save();
 
-                $order->load('address', 'design', 'size', 'designOrders.options');
+                $order->load('address', 'design', 'designOrders.options');
                 return $order;
             } catch (\Exception $e) {
                 Log::error('Error creating design: ' . $e->getMessage());
@@ -265,7 +265,7 @@ class OrderService
                 $order->save();
 
                 // تحميل العلاقات
-                $order->load('address', 'design', 'size', 'designOrders.options');
+                $order->load('address', 'design','designOrders.options');
 
                 return $order;
             } catch (\Exception $e) {
