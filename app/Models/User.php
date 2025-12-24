@@ -63,4 +63,22 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
+    // دالة مساعدة لإنشاء المحفظة تلقائياً عند التسجيل
+    public static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            // إنشاء محفظة تلقائياً للمستخدم الجديد
+            Wallet::create([
+                'user_id' => $user->id,
+                'balance' => 0.00,  
+            ]);
+        });
+    }
 }

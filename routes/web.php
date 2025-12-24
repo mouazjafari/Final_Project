@@ -7,6 +7,7 @@ use App\Http\Controllers\Web\Admin\DesignController;
 use App\Http\Controllers\Web\Admin\DesignOptionController;
 use App\Http\Controllers\Web\Admin\OrderController;
 use App\Http\Controllers\Web\Admin\UserController;
+use App\Http\Controllers\Web\Admin\WalletController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -91,5 +92,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Logout
         Route::post('/logout', [AuthController::class, 'logout'])
             ->name('logout');
+
+        // Wallets Management
+        Route::prefix('wallets')->name('wallets.')->group(function () {
+            Route::get('/', [WalletController::class, 'index'])
+                ->name('index');
+
+            Route::get('/{userId}', [WalletController::class, 'show'])
+                ->name('show');
+
+            Route::post('/{userId}/add', [WalletController::class, 'addBalance'])
+                ->name('add');
+
+            Route::post('/{userId}/withdraw', [WalletController::class, 'withdrawBalance'])
+                ->name('withdraw');
+        });
     });
 });
