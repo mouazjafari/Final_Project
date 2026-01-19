@@ -15,10 +15,10 @@
     @endif
 
     <!-- Page Header -->
-    <div class="page-header" style="background: linear-gradient(90deg, #2c3e50, #34495e);">
+    <div class="page-header">
         <h2>💰 محفظة {{ $user->name }}</h2>
         <a href="{{ route('admin.wallets.index') }}" class="btn-back">
-            ← العودة للقائمة
+            ← العودة
         </a>
     </div>
 

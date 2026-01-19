@@ -15,14 +15,14 @@
     @endif
 
     <!-- Page Header -->
-    <div class="page-header" style="background: linear-gradient(90deg, #2c3e50, #34495e);">
+    <div class="page-header">
         <h2>💰 إدارة المحافظ</h2>
         <div class="page-stats">
             <span class="stat-badge">
-                إجمالي المحافظ: {{ $wallets->count() }}
+                المحافظ: {{ $wallets->count() }}
             </span>
-            <span class="stat-badge" style="background: rgba(46, 204, 113, 0.2); color: #27ae60;">
-                إجمالي الأرصدة: {{ number_format($wallets->sum('balance'), 2) }} ₪
+            <span class="stat-badge">
+                الأرصدة: {{ number_format($wallets->sum('balance'), 2) }} ₪
             </span>
         </div>
     </div>
@@ -38,7 +38,7 @@
             <option value="">كل الأرصدة</option>
             <option value="zero">رصيد صفر</option>
             <option value="positive">رصيد موجب</option>
-            <option value="high">رصيد عالي (أكثر من 500)</option>
+            <option value="high">رصيد عالي (500+)</option>
         </select>
     </div>
 
