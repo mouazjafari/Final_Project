@@ -4,6 +4,7 @@ use App\Http\Controllers\APi\AdderssController;
 use App\Http\Controllers\APi\AuthController;
 use App\Http\Controllers\Api\DesignController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +41,12 @@ Route::prefix('user')->group(function () {
             Route::post('/create', [OrderController::class, 'create']);
             Route::post('/update/{designOrder}', [OrderController::class, 'update']);
             Route::post('/cancel/{order}', [OrderController::class, 'cancel']);
+        });
+        Route::prefix('payment')->group(function () {
+            Route::post('/create-intent/{order}', [PaymentController::class, 'createPaymentIntent']);
+            Route::post('/confirm', [PaymentController::class, 'confirmPayment']);
+            Route::post('/wallet/{order}', [PaymentController::class, 'payWithWallet']);
+            Route::get('/{payment}', [PaymentController::class, 'show']);
         });
     });
 });

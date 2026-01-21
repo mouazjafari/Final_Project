@@ -30,4 +30,8 @@ class Order extends Model
     {
         return $this->hasMany(DesignOrder::class);
     }
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
 }
