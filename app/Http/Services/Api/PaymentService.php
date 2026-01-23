@@ -47,7 +47,7 @@ class PaymentService
             // إنشاء Payment Intent في Stripe
             $paymentIntent = PaymentIntent::create([
                 'amount' => (int)($order->total_price * 100), // تحويل للـ Agorot (فلوس صغيرة)
-                'currency' => 'ils', // الشيكل الإسرائيلي
+                'currency' => 'usd', // الشيكل الإسرائيلي
                 'payment_method_types' => ['card'],
                 'metadata' => [
                     'order_id' => $order->id,
@@ -63,7 +63,7 @@ class PaymentService
                 'stripe_payment_intent_id' => $paymentIntent->id,
                 'amount' => $order->total_price,
                 'status' => 'pending',
-                'currency' => 'ILS',
+                'currency' => 'usd',
                 'metadata' => json_encode([
                     'payment_intent_client_secret' => $paymentIntent->client_secret,
                 ]),
@@ -73,7 +73,7 @@ class PaymentService
                 'payment_id' => $payment->id,
                 'client_secret' => $paymentIntent->client_secret,
                 'amount' => $order->total_price,
-                'currency' => 'ILS',
+                'currency' => 'usd',
             ];
 
         } catch (CardException $e) {
@@ -111,7 +111,7 @@ class PaymentService
                 // تحديث حالة الطلب
                 $order = $payment->order;
                 $order->update([
-                    'status' => 'processing', // أو completed حسب منطق التطبيق
+                    'status' => 'completed', // أو completed حسب منطق التطبيق
                 ]);
 
                 // تقليل الكمية من التصاميم

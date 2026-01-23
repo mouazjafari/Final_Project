@@ -6,9 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use App\Http\Services\Api\PaymentService;
 use App\Models\Order;
-use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth as FacadesAuth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class PaymentController extends Controller
@@ -31,10 +30,14 @@ class PaymentController extends Controller
 
             return $this->success($result, 'Payment intent created successfully', 200);
         } catch (\Exception $e) {
+            $statusCode = is_numeric($e->getCode()) && $e->getCode() >= 100 && $e->getCode() < 600
+                ? (int)$e->getCode()
+                : 500;
+
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], $e->getCode() ?: 500);
+            ], $statusCode);
         }
     }
 
@@ -63,10 +66,14 @@ class PaymentController extends Controller
                 'order' => new OrderResource($result['order']),
             ], 'Payment confirmed successfully', 200);
         } catch (\Exception $e) {
+            $statusCode = is_numeric($e->getCode()) && $e->getCode() >= 100 && $e->getCode() < 600
+                ? (int)$e->getCode()
+                : 500;
+
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], $e->getCode() ?: 500);
+            ], $statusCode);
         }
     }
 
@@ -85,10 +92,14 @@ class PaymentController extends Controller
                 'new_wallet_balance' => $result['new_wallet_balance'],
             ], 'Payment successful with wallet', 200);
         } catch (\Exception $e) {
+            $statusCode = is_numeric($e->getCode()) && $e->getCode() >= 100 && $e->getCode() < 600
+                ? (int)$e->getCode()
+                : 500;
+
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], $e->getCode() ?: 500);
+            ], $statusCode);
         }
     }
 
@@ -101,7 +112,7 @@ class PaymentController extends Controller
         try {
             $payment = \App\Models\Payment::with(['order', 'user'])
                 ->where('id', $paymentId)
-                ->where('user_id', FacadesAuth::id())
+                ->where('user_id', Auth::id())
                 ->firstOrFail();
 
             return $this->success($payment, 'Payment details retrieved successfully', 200);
