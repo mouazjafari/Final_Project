@@ -109,3 +109,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
     });
 });
+Route::get('/stripe/success', function () {
+    return view('stripe.success');
+})->name('stripe.success');
+
+Route::get('/stripe/cancel', function () {
+    return view('stripe.cancel');
+})->name('stripe.cancel');

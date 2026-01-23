@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use App\Http\Services\Api\PaymentService;
 use App\Models\Order;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -20,51 +21,17 @@ class PaymentController extends Controller
     }
 
     /**
-     * إنشاء Payment Intent للدفع بالبطاقة
-     * POST /api/user/payment/create-intent/{order}
+     * إنشاء Stripe Checkout Session
+     * POST /api/user/payment/create-checkout/{order}
      */
-    public function createPaymentIntent(Order $order)
+    public function createCheckout(Request $request, Order $order)
     {
         try {
-            $result = $this->paymentService->createPaymentIntent($order);
+            $result = $this->paymentService->createCheckoutSession(
+                $order,
+            );
 
-            return $this->success($result, 'Payment intent created successfully', 200);
-        } catch (\Exception $e) {
-            $statusCode = is_numeric($e->getCode()) && $e->getCode() >= 100 && $e->getCode() < 600
-                ? (int)$e->getCode()
-                : 500;
-
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], $statusCode);
-        }
-    }
-
-    /**
-     * تأكيد الدفع بعد نجاح العملية
-     * POST /api/user/payment/confirm
-     */
-    public function confirmPayment(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'payment_intent_id' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        try {
-            $result = $this->paymentService->confirmPayment($request->payment_intent_id);
-
-            return $this->success([
-                'payment' => $result['payment'],
-                'order' => new OrderResource($result['order']),
-            ], 'Payment confirmed successfully', 200);
+            return $this->success($result, 'Checkout session created successfully', 200);
         } catch (\Exception $e) {
             $statusCode = is_numeric($e->getCode()) && $e->getCode() >= 100 && $e->getCode() < 600
                 ? (int)$e->getCode()
@@ -105,17 +72,19 @@ class PaymentController extends Controller
 
     /**
      * عرض تفاصيل الدفعة
-     * GET /api/user/payment/{payment_id}
+     * GET /api/user/payment/{payment}
      */
-    public function show($paymentId)
+    public function show(Payment $payment)
     {
         try {
-            $payment = \App\Models\Payment::with(['order', 'user'])
-                ->where('id', $paymentId)
-                ->where('user_id', Auth::id())
-                ->firstOrFail();
+            if ($payment->user_id !== Auth::id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized',
+                ], 403);
+            }
 
-            return $this->success($payment, 'Payment details retrieved successfully', 200);
+            return $this->success($payment->load('order'), 'Payment details retrieved successfully', 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

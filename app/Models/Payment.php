@@ -11,6 +11,7 @@ class Payment extends Model
         'user_id',
         'payment_method',
         'stripe_payment_intent_id',
+        'stripe_session_id', // ✅ جديد
         'stripe_charge_id',
         'amount',
         'status',

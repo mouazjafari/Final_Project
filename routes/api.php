@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\DesignController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\WebhookController;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +15,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+Route::post('/stripe/webhook', [WebhookController::class, 'handleStripeWebhook'])->withoutMiddleware([VerifyCsrfToken::class]);
 
 Route::prefix('user')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -43,9 +46,13 @@ Route::prefix('user')->group(function () {
             Route::post('/cancel/{order}', [OrderController::class, 'cancel']);
         });
         Route::prefix('payment')->group(function () {
-            Route::post('/create-intent/{order}', [PaymentController::class, 'createPaymentIntent']);
-            Route::post('/confirm', [PaymentController::class, 'confirmPayment']);
+            // Stripe Checkout
+            Route::post('/create-checkout/{order}', [PaymentController::class, 'createCheckout']);
+
+            // Wallet Payment
             Route::post('/wallet/{order}', [PaymentController::class, 'payWithWallet']);
+
+            // عرض تفاصيل الدفعة
             Route::get('/{payment}', [PaymentController::class, 'show']);
         });
     });

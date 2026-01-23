@@ -8,9 +8,9 @@ use App\Models\Payment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Stripe\Exception\CardException;
-use Stripe\PaymentIntent;
+use Stripe\Checkout\Session;
 use Stripe\Stripe;
+use Stripe\Webhook;
 
 class PaymentService
 {
@@ -20,9 +20,9 @@ class PaymentService
     }
 
     /**
-     * إنشاء Payment Intent لبدء عملية الدفع
+     * إنشاء Stripe Checkout Session
      */
-    public function createPaymentIntent(Order $order, string $paymentMethod = 'card')
+    public function createCheckoutSession(Order $order)
     {
         try {
             // التحقق من ملكية الطلب
@@ -44,14 +44,29 @@ class PaymentService
                 throw new GeneralException('This order is already paid', 400);
             }
 
-            // إنشاء Payment Intent في Stripe
-            $paymentIntent = PaymentIntent::create([
-                'amount' => (int)($order->total_price * 100), // تحويل للـ Agorot (فلوس صغيرة)
-                'currency' => 'usd', // الشيكل الإسرائيلي
+            $user = Auth::user();
+
+            // إنشاء Stripe Checkout Session
+            $session = Session::create([
+                'customer_email' => $user->email,
                 'payment_method_types' => ['card'],
+                'line_items' => [[
+                    'price_data' => [
+                        'currency' => 'usd',
+                        'product_data' => [
+                            'name' => "Order #{$order->id}",
+                            'description' => "Payment for order #{$order->id}",
+                        ],
+                        'unit_amount' => (int)($order->total_price * 100), // بالسنت
+                    ],
+                    'quantity' => 1,
+                ]],
+                'mode' => 'payment',
+                'success_url' => route('stripe.success'),
+                'cancel_url' => route('stripe.cancel'),
                 'metadata' => [
                     'order_id' => $order->id,
-                    'user_id' => Auth::id(),
+                    'user_id' => $user->id,
                 ],
             ]);
 
@@ -59,98 +74,102 @@ class PaymentService
             $payment = Payment::create([
                 'order_id' => $order->id,
                 'user_id' => Auth::id(),
-                'payment_method' => $paymentMethod,
-                'stripe_payment_intent_id' => $paymentIntent->id,
+                'payment_method' => 'card',
+                'stripe_session_id' => $session->id,
                 'amount' => $order->total_price,
                 'status' => 'pending',
                 'currency' => 'usd',
                 'metadata' => json_encode([
-                    'payment_intent_client_secret' => $paymentIntent->client_secret,
+                    'session_url' => $session->url,
                 ]),
             ]);
 
             return [
                 'payment_id' => $payment->id,
-                'client_secret' => $paymentIntent->client_secret,
+                'session_id' => $session->id,
+                'checkout_url' => $session->url, // 🔥 الرابط للدفع
                 'amount' => $order->total_price,
                 'currency' => 'usd',
             ];
-
-        } catch (CardException $e) {
-            Log::error('Stripe Card Error: ' . $e->getMessage());
-            throw new GeneralException('Payment failed: ' . $e->getMessage(), 400);
         } catch (\Exception $e) {
-            Log::error('Payment Intent Error: ' . $e->getMessage());
+            Log::error('Stripe Checkout Error: ' . $e->getMessage());
             throw $e;
         }
     }
 
     /**
-     * تأكيد الدفع بعد نجاح العملية
+     * معالجة Webhook من Stripe
      */
-    public function confirmPayment(string $paymentIntentId)
+    public function handleWebhook(array $payload, string $signature)
     {
-        return DB::transaction(function () use ($paymentIntentId) {
+        return DB::transaction(function () use ($payload, $signature) {
             try {
-                // جلب Payment Intent من Stripe
-                $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
+                $webhookSecret = config('services.stripe.webhook_secret');
 
-                // التحقق من نجاح الدفع
-                if ($paymentIntent->status !== 'succeeded') {
-                    throw new GeneralException('Payment was not successful', 400);
+                // التحقق من صحة Webhook
+                $event = Webhook::constructEvent(
+                    json_encode($payload),
+                    $signature,
+                    $webhookSecret
+                );
+
+                // معالجة الحدث
+                if ($event->type === 'checkout.session.completed') {
+                    $session = $event->data->object;
+
+                    // جلب معلومات الطلب من metadata
+                    $orderId = $session->metadata->order_id;
+                    $userId = $session->metadata->user_id;
+
+                    // جلب الدفعة
+                    $payment = Payment::where('stripe_session_id', $session->id)
+                        ->where('user_id', $userId)
+                        ->where('order_id', $orderId)
+                        ->firstOrFail();
+
+                    // تحديث حالة الدفعة
+                    $payment->update([
+                        'status' => 'completed',
+                        'stripe_payment_intent_id' => $session->payment_intent,
+                        'paid_at' => now(),
+                    ]);
+
+                    // تحديث حالة الطلب
+                    $order = $payment->order;
+                    $order->update(['status' => 'processing']);
+
+                    // تقليل الكمية من التصاميم
+                    foreach ($order->designOrders as $designOrder) {
+                        $design = $designOrder->design;
+                        $design->decrement('quantity', $designOrder->quantity);
+                    }
+
+                    Log::info("Payment completed for Order #{$orderId}");
                 }
 
-                // جلب الدفعة من قاعدة البيانات
-                $payment = Payment::where('stripe_payment_intent_id', $paymentIntentId)
-                    ->where('user_id', Auth::id())
-                    ->firstOrFail();
-
-                // تحديث حالة الدفعة
-                $payment->markAsCompleted($paymentIntent->charges->data[0]->id ?? null);
-
-                // تحديث حالة الطلب
-                $order = $payment->order;
-                $order->update([
-                    'status' => 'completed', // أو completed حسب منطق التطبيق
-                ]);
-
-                // تقليل الكمية من التصاميم
-                foreach ($order->designOrders as $designOrder) {
-                    $design = $designOrder->design;
-                    $design->decrement('quantity', $designOrder->quantity);
-                }
-
-                return [
-                    'success' => true,
-                    'payment' => $payment,
-                    'order' => $order->load('designOrders.design'),
-                ];
-
+                return ['status' => 'success'];
             } catch (\Exception $e) {
-                Log::error('Confirm Payment Error: ' . $e->getMessage());
+                Log::error('Webhook Error: ' . $e->getMessage());
                 throw $e;
             }
         });
     }
 
     /**
-     * الدفع من المحفظة
+     * الدفع من المحفظة (موجود مسبقاً)
      */
     public function payWithWallet(Order $order)
     {
         return DB::transaction(function () use ($order) {
             try {
-                // التحقق من ملكية الطلب
                 if ($order->user_id !== Auth::id()) {
                     throw new GeneralException('Unauthorized access to this order', 403);
                 }
 
-                // التحقق من حالة الطلب
                 if ($order->status !== 'pending') {
                     throw new GeneralException('This order cannot be paid', 400);
                 }
 
-                // جلب محفظة المستخدم
                 $user = Auth::user();
                 $wallet = $user->wallet;
 
@@ -158,18 +177,15 @@ class PaymentService
                     throw new GeneralException('Wallet not found', 404);
                 }
 
-                // التحقق من الرصيد الكافي
                 if ($wallet->balance < $order->total_price) {
                     throw new GeneralException('Insufficient wallet balance', 400);
                 }
 
-                // سحب المبلغ من المحفظة
                 $wallet->withdraw([
                     'amount' => $order->total_price,
                     'notes' => "Payment for order #{$order->id}",
                 ]);
 
-                // إنشاء سجل الدفع
                 $payment = Payment::create([
                     'order_id' => $order->id,
                     'user_id' => Auth::id(),
@@ -180,12 +196,8 @@ class PaymentService
                     'paid_at' => now(),
                 ]);
 
-                // تحديث حالة الطلب
-                $order->update([
-                    'status' => 'processing',
-                ]);
+                $order->update(['status' => 'processing']);
 
-                // تقليل الكمية من التصاميم
                 foreach ($order->designOrders as $designOrder) {
                     $design = $designOrder->design;
                     $design->decrement('quantity', $designOrder->quantity);
@@ -197,7 +209,6 @@ class PaymentService
                     'order' => $order->load('designOrders.design'),
                     'new_wallet_balance' => $wallet->fresh()->balance,
                 ];
-
             } catch (\Exception $e) {
                 Log::error('Wallet Payment Error: ' . $e->getMessage());
                 throw $e;
