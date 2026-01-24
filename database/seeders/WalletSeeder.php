@@ -14,11 +14,11 @@ class WalletSeeder extends Seeder
         $users = User::whereDoesntHave('wallet')->get();
 
         foreach ($users as $user) {
-            Wallet::create([
-                'user_id' => $user->id,
-                'balance' => 0.00,
-            ]);
+            if ($user->hasrole('user'))
+                Wallet::create([
+                    'user_id' => $user->id,
+                    'balance' => 0.00,
+                ]);
         }
-
     }
 }

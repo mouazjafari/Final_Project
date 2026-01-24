@@ -3,6 +3,7 @@
 namespace App\Http\Services\Api;
 
 use App\Exceptions\GeneralException;
+use App\Http\Enum\OrderStatusEnum;
 use App\Models\Order;
 use App\Models\Payment;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +19,6 @@ class PaymentService
     {
         Stripe::setApiKey(config('services.stripe.secret'));
     }
-
     /**
      * إنشاء Stripe Checkout Session
      */
@@ -84,10 +84,12 @@ class PaymentService
                 ]),
             ]);
 
+            // $order->update(['status' => OrderStatusEnum::Processing]);
+
             return [
                 'payment_id' => $payment->id,
                 'session_id' => $session->id,
-                'checkout_url' => $session->url, // 🔥 الرابط للدفع
+                'checkout_url' => $session->url,
                 'amount' => $order->total_price,
                 'currency' => 'usd',
             ];
@@ -196,7 +198,7 @@ class PaymentService
                     'paid_at' => now(),
                 ]);
 
-                $order->update(['status' => 'processing']);
+                $order->update(['status' => OrderStatusEnum::Processing]);
 
                 foreach ($order->designOrders as $designOrder) {
                     $design = $designOrder->design;

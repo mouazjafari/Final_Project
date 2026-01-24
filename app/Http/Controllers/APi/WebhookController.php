@@ -23,8 +23,7 @@ class WebhookController extends Controller
     public function handleStripeWebhook(Request $request)
     {
         $payload = $request->getContent();
-        $signature = $request->header('Stripe-Signature');
-
+    $signature = $request->header('Stripe-Signature') ?? 'test_signature';
         try {
             $this->paymentService->handleWebhook(
                 json_decode($payload, true),

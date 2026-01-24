@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             UserSeeder::class,
             CitySeeder::class,
-            SizeSeeder::class
+            SizeSeeder::class,
+            WalletSeeder::class,
         ]);
     }
 }
