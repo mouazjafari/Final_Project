@@ -102,60 +102,122 @@ class PaymentService
     /**
      * معالجة Webhook من Stripe
      */
+    /**
+     * معالجة Webhook من Stripe
+     */
     public function handleWebhook(array $payload, string $signature)
     {
         return DB::transaction(function () use ($payload, $signature) {
             try {
                 $webhookSecret = config('services.stripe.webhook_secret');
 
-                // التحقق من صحة Webhook
-                $event = Webhook::constructEvent(
-                    json_encode($payload),
-                    $signature,
-                    $webhookSecret
-                );
+                if (!empty($webhookSecret) && app()->environment('production')) {
+                    Log::info('🔐 Verifying webhook signature (Production Mode)');
 
-                // معالجة الحدث
-                if ($event->type === 'checkout.session.completed') {
+                    $event = \Stripe\Webhook::constructEvent(
+                        json_encode($payload),
+                        $signature,
+                        $webhookSecret
+                    );
+
+                    $eventType = $event->type;
                     $session = $event->data->object;
+                } else {
+                    Log::info('⚠️ Skipping signature verification (Development Mode)');
 
-                    // جلب معلومات الطلب من metadata
-                    $orderId = $session->metadata->order_id;
-                    $userId = $session->metadata->user_id;
+                    $eventType = $payload['type'] ?? null;
+                    $session = (object) ($payload['data']['object'] ?? []);
+                }
 
-                    // جلب الدفعة
-                    $payment = Payment::where('stripe_session_id', $session->id)
-                        ->where('user_id', $userId)
-                        ->where('order_id', $orderId)
-                        ->firstOrFail();
+                Log::info('📦 Webhook event type: ' . $eventType);
+                Log::info('🔹 Session metadata:', (array)($session->metadata ?? []));
 
-                    // تحديث حالة الدفعة
+                if ($eventType === 'checkout.session.completed') {
+                    $orderId = $session->metadata->order_id ?? null;
+                    $userId = $session->metadata->user_id ?? null;
+
+                    // ✅ إذا كانت metadata فارغة، حاول الحصول على البيانات بطريقة آمنة
+                    if (!$orderId || !$userId) {
+                        Log::warning('⚠️ Metadata missing, trying fallback method', [
+                            'session_id' => $session->id ?? 'UNKNOWN',
+                        ]);
+
+                        // fallback: ابحث عن أي payment مرتبط بـ stripe_session_id
+                        $payment = Payment::where('stripe_session_id', $session->id)->first();
+                        if ($payment) {
+                            $orderId = $payment->order_id;
+                            $userId = $payment->user_id;
+                            Log::info('ℹ️ Fallback succeeded', [
+                                'order_id' => $orderId,
+                                'user_id' => $userId,
+                            ]);
+                        } else {
+                            throw new \Exception('Cannot process payment: Missing order_id or user_id in metadata');
+                        }
+                    }
+
+                    $payment = Payment::firstOrCreate(
+                        [
+                            'stripe_session_id' => $session->id,
+                            'order_id' => $orderId,
+                            'user_id' => $userId,
+                        ],
+                        [
+                            'payment_method' => 'card',
+                            'amount' => Order::find($orderId)?->total_price ?? 0,
+                            'status' => 'pending',
+                            'currency' => 'usd',
+                        ]
+                    );
+
                     $payment->update([
                         'status' => 'completed',
-                        'stripe_payment_intent_id' => $session->payment_intent,
+                        'stripe_payment_intent_id' => $session->payment_intent ?? null,
                         'paid_at' => now(),
                     ]);
 
-                    // تحديث حالة الطلب
                     $order = $payment->order;
-                    $order->update(['status' => 'processing']);
+                    if ($order) {
+                        $order->update(['status' => 'processing']);
 
-                    // تقليل الكمية من التصاميم
-                    foreach ($order->designOrders as $designOrder) {
-                        $design = $designOrder->design;
-                        $design->decrement('quantity', $designOrder->quantity);
+                        foreach ($order->designOrders as $designOrder) {
+                            $design = $designOrder->design;
+                            if ($design->quantity >= $designOrder->quantity) {
+                                $design->decrement('quantity', $designOrder->quantity);
+                            } else {
+                                Log::warning("⚠️ Insufficient design quantity", [
+                                    'design_id' => $design->id,
+                                    'available' => $design->quantity,
+                                    'required' => $designOrder->quantity,
+                                ]);
+                            }
+                        }
                     }
 
-                    Log::info("Payment completed for Order #{$orderId}");
+                    Log::info("✅ Payment completed successfully", [
+                        'order_id' => $orderId,
+                        'payment_id' => $payment->id,
+                        'amount' => $payment->amount,
+                    ]);
+                } else {
+                    Log::info("ℹ️ Ignoring event type: {$eventType}");
                 }
 
                 return ['status' => 'success'];
+            } catch (\UnexpectedValueException $e) {
+                Log::error('❌ Invalid webhook signature', ['error' => $e->getMessage()]);
+                throw $e;
             } catch (\Exception $e) {
-                Log::error('Webhook Error: ' . $e->getMessage());
+                Log::error('❌ Webhook processing error', [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ]);
                 throw $e;
             }
         });
     }
+
 
     /**
      * الدفع من المحفظة (موجود مسبقاً)
