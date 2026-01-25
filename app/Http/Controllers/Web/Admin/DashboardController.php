@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Enum\RoleUserEnum;
 use App\Models\Address;
+use App\Models\Coupon;
 use App\Models\Design;
 use App\Models\DesignOption;
 use App\Models\Order;
@@ -23,6 +24,7 @@ class DashboardController extends Controller
         $designCount = Design::count();
         $designOptionCount = DesignOption::count();
         $orderCount = Order::count();
-        return view('admin.dashboard', compact('user', 'usersCount', 'addressCount', 'designCount', 'designOptionCount', 'orderCount'));
+        $couponCount = Coupon::count();
+        return view('admin.dashboard', compact('user', 'usersCount', 'addressCount', 'designCount', 'designOptionCount', 'orderCount', 'couponCount'));
     }
 }

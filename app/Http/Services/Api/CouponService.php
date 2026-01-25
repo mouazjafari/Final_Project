@@ -21,7 +21,7 @@ class CouponService
                 $userId = Auth::id();
 
                 // 1. التحقق من ملكية الأوردر
-                if ($order->user_id !== $userId) {
+                if ($order->user_id !== Auth::id()) {
                     throw new GeneralException('لا يمكنك تطبيق كوبون على طلب ليس لك', 403);
                 }
 
@@ -30,7 +30,7 @@ class CouponService
                     throw new GeneralException('لا يمكن تطبيق كوبون على طلب تم معالجته', 400);
                 }
 
-                // 3. التحقق من عدم وجود كوبون مطبق مسبقاً
+                // 3. التحقق من عدم وجود كوبون مطبق مسبقاًa
                 if ($order->coupon_id) {
                     throw new GeneralException('تم تطبيق كوبون على هذا الطلب مسبقاً', 400);
                 }

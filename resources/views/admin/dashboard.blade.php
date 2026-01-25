@@ -44,5 +44,10 @@
             <h3>الطلبات</h3>
             <div class="number">{{ $orderCount ?? 0 }}</div>
         </div>
+        <div class="stat-card">
+            <div class="icon">🏷️</div>
+            <h3>الكوبونات</h3>
+            <div class="number">{{ $couponCount ?? 0 }}</div>
+        </div>
     </div>
 @endsection

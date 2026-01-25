@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\APi\AdderssController;
 use App\Http\Controllers\APi\AuthController;
+use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\DesignController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PaymentController;
@@ -44,6 +45,8 @@ Route::prefix('user')->group(function () {
             Route::post('/create', [OrderController::class, 'create']);
             Route::post('/update/{designOrder}', [OrderController::class, 'update']);
             Route::post('/cancel/{order}', [OrderController::class, 'cancel']);
+            Route::post('{order}/apply-coupon', [CouponController::class, 'apply']);
+            Route::post('{order}/remove-coupon', [CouponController::class, 'remove']);
         });
         Route::prefix('payment')->group(function () {
             // Stripe Checkout
