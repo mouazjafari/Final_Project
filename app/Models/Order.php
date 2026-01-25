@@ -10,9 +10,14 @@ class Order extends Model
         'user_id',
         'size_id',
         'address_id',
+        'coupon_id',        // ✅ جديد
+        'discount_amount',  // ✅ جديد
         'status',
         'notes',
         'total_price',
+    ];
+    protected $casts = [
+        'discount_amount' => 'decimal:2', // ✅ جديد
     ];
     public function user()
     {
@@ -33,5 +38,10 @@ class Order extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+    // ✅ جديد - العلاقة مع الكوبون
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
     }
 }

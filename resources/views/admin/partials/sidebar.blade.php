@@ -43,7 +43,7 @@
         </li>
         <li>
             <a href="{{ route('admin.orders.index') ?? '#' }}">
-                <span class="icon">📦</span>
+                <span class="icon">🛒</span>
                 <span class="text">الطلبات</span>
             </a>
         </li>
@@ -52,6 +52,13 @@
                 class="{{ request()->routeIs('admin.wallets.*') ? 'active' : '' }}">
                 <span class="icon">💰</span>
                 <span class="text">المحافظ</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('admin.coupons.index') }}"
+                class="{{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
+                <span class="icon">🎟️</span>
+                <span class="text">الكوبونات</span>
             </a>
         </li>
         {{--

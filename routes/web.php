@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Web\Admin\AddressController;
 use App\Http\Controllers\Web\Admin\AuthController;
+use App\Http\Controllers\Web\Admin\CouponController;
 use App\Http\Controllers\Web\Admin\DashboardController;
 use App\Http\Controllers\Web\Admin\DesignController;
 use App\Http\Controllers\Web\Admin\DesignOptionController;
@@ -106,6 +107,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
             Route::post('/{userId}/withdraw', [WalletController::class, 'withdrawBalance'])
                 ->name('withdraw');
+        });
+        Route::prefix('coupons')->name('coupons.')->group(function () {
+            Route::get('/', [CouponController::class, 'index'])->name('index');
+            Route::get('/create', [CouponController::class, 'create'])->name('create');
+            Route::post('/', [CouponController::class, 'store'])->name('store');
+            Route::get('/{coupon}/edit', [CouponController::class, 'edit'])->name('edit');
+            Route::put('/{coupon}', [CouponController::class, 'update'])->name('update');
+            Route::delete('/{coupon}', [CouponController::class, 'destroy'])->name('destroy');
+            Route::post('/{coupon}/toggle-status', [CouponController::class, 'toggleStatus'])->name('toggle');
+            Route::get('/{coupon}/usages', [CouponController::class, 'showUsages'])->name('usages');
         });
     });
 });

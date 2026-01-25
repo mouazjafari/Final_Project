@@ -30,4 +30,8 @@ class OrderPolicy
     {
         return $user->hasPermissionTo('create order');
     }
+    public function apply(User $user, Order $order)
+    {
+        return $order->user_id === $user->id && $user->hasPermissionTo('apply coupon');
+    }
 }

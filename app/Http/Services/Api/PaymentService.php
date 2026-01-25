@@ -102,9 +102,6 @@ class PaymentService
     /**
      * معالجة Webhook من Stripe
      */
-    /**
-     * معالجة Webhook من Stripe
-     */
     public function handleWebhook(array $payload, string $signature)
     {
         return DB::transaction(function () use ($payload, $signature) {
@@ -114,7 +111,7 @@ class PaymentService
                 if (!empty($webhookSecret) && app()->environment('production')) {
                     Log::info('🔐 Verifying webhook signature (Production Mode)');
 
-                    $event = \Stripe\Webhook::constructEvent(
+                    $event = Webhook::constructEvent(
                         json_encode($payload),
                         $signature,
                         $webhookSecret
