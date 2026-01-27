@@ -18,13 +18,27 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-        /** @var \App\Models\User $user */
         $usersCount = User::Role(RoleUserEnum::User->value)->count();
         $addressCount = Address::count();
         $designCount = Design::count();
         $designOptionCount = DesignOption::count();
         $orderCount = Order::count();
         $couponCount = Coupon::count();
-        return view('admin.dashboard', compact('user', 'usersCount', 'addressCount', 'designCount', 'designOptionCount', 'orderCount', 'couponCount'));
+
+        // ✅ جديد
+        $rolesCount = \Spatie\Permission\Models\Role::count();
+        $permissionsCount = \Spatie\Permission\Models\Permission::count();
+
+        return view('admin.dashboard', compact(
+            'user',
+            'usersCount',
+            'addressCount',
+            'designCount',
+            'designOptionCount',
+            'orderCount',
+            'couponCount',
+            'rolesCount',
+            'permissionsCount'
+        ));
     }
 }

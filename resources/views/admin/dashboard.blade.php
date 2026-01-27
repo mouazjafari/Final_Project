@@ -49,5 +49,16 @@
             <h3>الكوبونات</h3>
             <div class="number">{{ $couponCount ?? 0 }}</div>
         </div>
+        <div class="stat-card">
+            <div class="icon">👥</div>
+            <h3>الأدوار</h3>
+            <div class="number">{{ $rolesCount ?? 0 }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="icon">🔐</div>
+            <h3>الصلاحيات</h3>
+            <div class="number">{{ $permissionsCount ?? 0 }}</div>
+        </div>
     </div>
 @endsection

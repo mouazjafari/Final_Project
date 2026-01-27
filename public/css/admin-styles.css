@@ -306,3 +306,75 @@ a {
         width: 100%;
     }
 }
+/* ==================== Dropdown Menu ==================== */
+.sidebar-menu li.has-dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+}
+
+.dropdown-arrow {
+    margin-left: auto;
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.dropdown-toggle.open .dropdown-arrow {
+    transform: rotate(-180deg);
+}
+
+.dropdown-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    max-height: 0;
+    opacity: 0;
+}
+
+.dropdown-menu[style*="display: block"] {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.dropdown-menu li {
+    margin: 0;
+}
+
+.dropdown-menu a {
+    padding: 12px 20px 12px 50px;
+    font-size: 0.9rem;
+}
+
+.dropdown-menu a:hover {
+    background: rgba(255, 255, 255, 0.15);
+    padding-right: 25px;
+}
+
+.dropdown-menu a.active {
+    background: rgba(52, 152, 219, 0.4);
+    border-right: 3px solid #3498db;
+}
+
+/* Sidebar Collapsed State */
+.sidebar.collapsed .dropdown-arrow {
+    display: none;
+}
+
+.sidebar.collapsed .dropdown-menu {
+    display: none !important;
+}
+
+.sidebar.collapsed .has-dropdown > a {
+    justify-content: center;
+}

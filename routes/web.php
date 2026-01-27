@@ -7,6 +7,8 @@ use App\Http\Controllers\Web\Admin\DashboardController;
 use App\Http\Controllers\Web\Admin\DesignController;
 use App\Http\Controllers\Web\Admin\DesignOptionController;
 use App\Http\Controllers\Web\Admin\OrderController;
+use App\Http\Controllers\Web\Admin\PermissionController;
+use App\Http\Controllers\Web\Admin\RoleController;
 use App\Http\Controllers\Web\Admin\UserController;
 use App\Http\Controllers\Web\Admin\WalletController;
 use Illuminate\Support\Facades\Route;
@@ -117,6 +119,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::delete('/{coupon}', [CouponController::class, 'destroy'])->name('destroy');
             Route::post('/{coupon}/toggle-status', [CouponController::class, 'toggleStatus'])->name('toggle');
             Route::get('/{coupon}/usages', [CouponController::class, 'showUsages'])->name('usages');
+        });
+        Route::prefix('roles')->name('roles.')->group(function () {
+            Route::get('/', [RoleController::class, 'index'])->name('index');
+            Route::get('/create', [RoleController::class, 'create'])->name('create');
+            Route::post('/', [RoleController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [RoleController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [RoleController::class, 'update'])->name('update');
+            Route::delete('/{id}', [RoleController::class, 'destroy'])->name('destroy');
+        });
+        Route::prefix('permissions')->name('permissions.')->group(function () {
+            Route::get('/', [PermissionController::class, 'index'])->name('index');
+            Route::post('/', [PermissionController::class, 'store'])->name('store');
+            Route::delete('/{id}', [PermissionController::class, 'destroy'])->name('destroy');
         });
     });
 });
