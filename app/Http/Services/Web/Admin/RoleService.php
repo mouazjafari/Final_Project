@@ -21,7 +21,15 @@ class RoleService
             ]);
 
             if (!empty($data['permissions'])) {
-                $role->syncPermissions($data['permissions']);
+                // ✅ فلتر الـ Permissions - خلي بس اللي عندهم نفس الـ guard
+                $validPermissions = \Spatie\Permission\Models\Permission::whereIn('id', $data['permissions'])
+                    ->where('guard_name', $data['guard_name']) // ✅ نفس الـ guard
+                    ->pluck('id')
+                    ->toArray();
+
+                if (!empty($validPermissions)) {
+                    $role->syncPermissions($validPermissions);
+                }
             }
 
             return $role;
@@ -36,7 +44,13 @@ class RoleService
             }
 
             if (isset($data['permissions'])) {
-                $role->syncPermissions($data['permissions']);
+                // ✅ فلتر الـ Permissions - خلي بس اللي عندهم نفس الـ guard
+                $validPermissions = \Spatie\Permission\Models\Permission::whereIn('id', $data['permissions'])
+                    ->where('guard_name', $role->guard_name) // ✅ نفس guard الـ Role
+                    ->pluck('id')
+                    ->toArray();
+
+                $role->syncPermissions($validPermissions);
             }
 
             return $role;

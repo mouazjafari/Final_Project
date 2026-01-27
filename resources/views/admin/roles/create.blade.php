@@ -44,7 +44,7 @@
                            placeholder="مثال: manager"
                            required
                            maxlength="100">
-                    <small>استخدم أحرف صغيرة بدون مسافات</small>
+                    <small>استخدم أحرف صغيرة بدون مسافات (مثل: admin, manager, editor)</small>
                 </div>
 
                 <!-- Guard Name -->
@@ -53,20 +53,32 @@
                     <select name="guard_name" id="guard_name" required>
                         <option value="">اختر Guard</option>
                         <option value="api" {{ old('guard_name') === 'api' ? 'selected' : '' }}>
-                            🔌 API
+                            🔌 API - للتطبيقات والموبايل
                         </option>
                         <option value="web" {{ old('guard_name') === 'web' ? 'selected' : '' }}>
-                            🌐 WEB
+                            🌐 WEB - لوحة التحكم
                         </option>
                     </select>
-                    <small>API للـ Mobile/API، WEB لـ Admin Panel</small>
+                    <small>اختر API للمستخدمين عبر التطبيق، أو WEB للوحة التحكم</small>
                 </div>
             </div>
 
             <!-- Permissions Section -->
             <div class="permissions-section">
-                <h3>🔐 الصلاحيات (Permissions)</h3>
-                <small>اختر الصلاحيات التي تريد إعطاءها لهذا الدور</small>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div>
+                        <h3 style="margin: 0;">🔐 الصلاحيات (Permissions)</h3>
+                        <small style="color: #6b7280;">اختر الصلاحيات التي تريد إعطاءها لهذا الدور</small>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" class="btn-secondary" onclick="selectAllPermissions()">
+                            ✅ تحديد الكل
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="deselectAllPermissions()">
+                            ❌ إلغاء التحديد
+                        </button>
+                    </div>
+                </div>
 
                 <div class="permissions-grid">
                     @php
@@ -75,13 +87,16 @@
 
                     @foreach($groupedPermissions as $guard => $perms)
                         <div class="guard-group">
-                            <h4 class="guard-title">
-                                @if($guard === 'api')
-                                    🔌 API Permissions
-                                @else
-                                    🌐 WEB Permissions
-                                @endif
-                            </h4>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h4 class="guard-title" style="margin: 0;">
+                                    @if($guard === 'api')
+                                        🔌 API Permissions
+                                    @else
+                                        🌐 WEB Permissions
+                                    @endif
+                                </h4>
+                                <small style="color: #6b7280;">{{ $perms->count() }} صلاحية</small>
+                            </div>
 
                             <div class="permissions-list">
                                 @foreach($perms as $permission)
@@ -89,6 +104,7 @@
                                         <input type="checkbox"
                                                name="permissions[]"
                                                value="{{ $permission->id }}"
+                                               class="permission-input guard-{{ $guard }}"
                                                {{ in_array($permission->id, old('permissions', [])) ? 'checked' : '' }}>
                                         <span class="checkbox-label">{{ $permission->name }}</span>
                                     </label>
@@ -97,6 +113,14 @@
                         </div>
                     @endforeach
                 </div>
+
+                @if($permissions->count() === 0)
+                    <div style="text-align: center; padding: 3rem; background: #f9fafb; border-radius: 12px; margin-top: 1rem;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;">🔐</div>
+                        <h3 style="color: #6b7280;">لا توجد صلاحيات متاحة</h3>
+                        <p style="color: #9ca3af; margin-top: 0.5rem;">يرجى إنشاء صلاحيات أولاً</p>
+                    </div>
+                @endif
             </div>
 
             <!-- Form Actions -->
@@ -114,4 +138,53 @@
 
 @push('scripts')
     <script src="{{ asset('js/roles-permissions-scripts.js') }}"></script>
+    <script>
+        // Select/Deselect All Permissions
+        function selectAllPermissions() {
+            document.querySelectorAll('.permission-input').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        }
+
+        function deselectAllPermissions() {
+            document.querySelectorAll('.permission-input').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        // Form Validation
+        document.getElementById('roleForm')?.addEventListener('submit', function(e) {
+            const name = document.getElementById('name').value.trim();
+            const guardName = document.getElementById('guard_name').value;
+
+            if (!name) {
+                e.preventDefault();
+                alert('⚠️ الرجاء إدخال اسم الدور');
+                document.getElementById('name').focus();
+                return false;
+            }
+
+            if (!guardName) {
+                e.preventDefault();
+                alert('⚠️ الرجاء اختيار Guard Name');
+                document.getElementById('guard_name').focus();
+                return false;
+            }
+
+            // Check if name contains spaces or special characters
+            if (!/^[a-z0-9_-]+$/.test(name)) {
+                e.preventDefault();
+                alert('⚠️ اسم الدور يجب أن يحتوي على أحرف صغيرة وأرقام فقط بدون مسافات');
+                document.getElementById('name').focus();
+                return false;
+            }
+        });
+
+        // Auto-lowercase role name
+        document.getElementById('name')?.addEventListener('input', function() {
+            this.value = this.value.toLowerCase().replace(/\s+/g, '-');
+        });
+
+        console.log('✅ Role Create JavaScript loaded successfully!');
+    </script>
 @endpush
