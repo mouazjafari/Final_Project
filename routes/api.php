@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\DesignController;
 use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\WebhookController;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -48,6 +49,11 @@ Route::prefix('user')->group(function () {
             Route::post('/cancel/{order}', [OrderController::class, 'cancel']);
             Route::post('{order}/apply-coupon', [CouponController::class, 'apply']);
             Route::post('{order}/remove-coupon', [CouponController::class, 'remove']);
+            Route::prefix('review')->group(function () {
+                Route::post('/createReview', [ReviewController::class, 'store']);
+                Route::post('/updateReview/{review}', [ReviewController::class, 'update']);
+                Route::delete('/deleteReview/{review}', [ReviewController::class, 'delete']);
+            });
         });
         Route::prefix('payment')->group(function () {
             // Stripe Checkout
@@ -58,7 +64,8 @@ Route::prefix('user')->group(function () {
 
             // عرض تفاصيل الدفعة
             Route::get('/{payment}', [PaymentController::class, 'show']);
+
+            Route::post('/createInvoice/{order}', [InvoiceController::class, 'create']);
         });
-        Route::post('/createInvoice/{order}', [InvoiceController::class, 'create']);
     });
 });

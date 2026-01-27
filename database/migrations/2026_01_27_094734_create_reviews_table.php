@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('design_order', function (Blueprint $table) {
+        Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('design_id')->constrained('designs')->onDelete('cascade');
             $table->foreignId(column: 'order_id')->constrained('orders')->onDelete('cascade');
-            $table->foreignId('size_id')->constrained('sizes')->onDelete('cascade');
-            $table->integer('quantity');
-            $table->decimal('unit_price', 10, 2);
+            $table->foreignId(column: 'user_id')->constrained('users')->onDelete('cascade');
+            $table->text('comment')->nullable();
+            $table->enum('rating', [1, 2, 3, 4, 5])->nullable(); // Assuming rating is between 1-5
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('design_order');
+        Schema::dropIfExists('reviews');
     }
 };

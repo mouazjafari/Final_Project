@@ -67,6 +67,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Wallet::class);
     }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 
     // دالة مساعدة لإنشاء المحفظة تلقائياً عند التسجيل
     public static function boot()
@@ -77,7 +81,7 @@ class User extends Authenticatable
             // إنشاء محفظة تلقائياً للمستخدم الجديد
             Wallet::create([
                 'user_id' => $user->id,
-                'balance' => 0.00,  
+                'balance' => 0.00,
             ]);
         });
     }
