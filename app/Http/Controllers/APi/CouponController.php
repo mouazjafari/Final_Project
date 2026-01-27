@@ -24,7 +24,7 @@ class CouponController extends Controller
      */
     public function apply(ApplyCouponRequest $request, Order $order)
     {
-        // Gate::authorize('apply', $order);
+        Gate::authorize('apply', $order);
 
         try {
             $result = $this->couponService->applyCouponToOrder(
@@ -37,7 +37,6 @@ class CouponController extends Controller
                 'discount_amount' => $result['discount_amount'],
                 'new_total' => $result['new_total'],
             ], $result['message'], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -52,7 +51,7 @@ class CouponController extends Controller
      */
     public function remove(Order $order)
     {
-        // Gate::authorize('apply', $order);
+        Gate::authorize('apply', $order);
 
         try {
             $result = $this->couponService->removeCouponFromOrder($order);
@@ -60,7 +59,6 @@ class CouponController extends Controller
             return $this->success([
                 'order' => new OrderResource($result['order']),
             ], $result['message'], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

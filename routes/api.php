@@ -4,6 +4,7 @@ use App\Http\Controllers\APi\AdderssController;
 use App\Http\Controllers\APi\AuthController;
 use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\DesignController;
+use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\UserController;
@@ -58,5 +59,6 @@ Route::prefix('user')->group(function () {
             // عرض تفاصيل الدفعة
             Route::get('/{payment}', [PaymentController::class, 'show']);
         });
+        Route::post('/createInvoice/{order}', [InvoiceController::class, 'create']);
     });
 });

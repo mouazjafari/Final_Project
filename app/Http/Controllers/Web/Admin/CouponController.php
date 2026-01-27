@@ -7,7 +7,6 @@ use App\Http\Requests\CreateCouponRequest;
 use App\Http\Requests\UpdateCouponRequest;
 use App\Models\Coupon;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
@@ -19,7 +18,7 @@ class CouponController extends Controller
      */
     public function index()
     {
-        // Gate::authorize('view', Coupon::class);
+        Gate::authorize('view', Coupon::class);
 
         $coupons = Coupon::withCount(['usages', 'allowedUsers'])
             ->latest()
@@ -33,7 +32,7 @@ class CouponController extends Controller
      */
     public function create()
     {
-        // Gate::authorize('create', Coupon::class);
+        Gate::authorize('create', Coupon::class);
 
         $users = User::role('user')->select('id', 'name', 'email')->get();
 
@@ -45,7 +44,7 @@ class CouponController extends Controller
      */
     public function store(CreateCouponRequest $request)
     {
-        // Gate::authorize('create', Coupon::class);
+        Gate::authorize('create', Coupon::class);
 
         try {
             DB::beginTransaction();
@@ -89,7 +88,7 @@ class CouponController extends Controller
      */
     public function edit($id)
     {
-        // Gate::authorize('update', Coupon::class);
+        Gate::authorize('update', Coupon::class);
 
         $coupon = Coupon::with('allowedUsers')->findOrFail($id);
         $users = User::role('user')->select('id', 'name', 'email')->get();
@@ -102,7 +101,7 @@ class CouponController extends Controller
      */
     public function update(UpdateCouponRequest $request, $id)
     {
-        // Gate::authorize('update', Coupon::class);
+        Gate::authorize('update', Coupon::class);
 
         try {
             DB::beginTransaction();
@@ -139,7 +138,7 @@ class CouponController extends Controller
      */
     public function destroy($id)
     {
-        // Gate::authorize('delete', Coupon::class);
+        Gate::authorize('delete', Coupon::class);
 
         try {
             $coupon = Coupon::findOrFail($id);
@@ -167,7 +166,7 @@ class CouponController extends Controller
      */
     public function toggleStatus($id)
     {
-        // Gate::authorize('update', Coupon::class);
+        Gate::authorize('update', Coupon::class);
 
         try {
             $coupon = Coupon::findOrFail($id);
@@ -196,7 +195,7 @@ class CouponController extends Controller
      */
     public function showUsages($id)
     {
-        // Gate::authorize('view', Coupon::class);
+        Gate::authorize('view', Coupon::class);
 
         $coupon = Coupon::with(['usages.user', 'usages.order'])
             ->findOrFail($id);

@@ -62,6 +62,7 @@ class PermissionSeeder extends Seeder
                 'delete design option',
                 'add to wallet',
                 'withdraw from wallet',
+                'view coupons',
                 'create coupons',
                 'edit coupons',
                 'delete coupons',

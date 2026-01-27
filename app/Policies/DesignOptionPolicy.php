@@ -9,14 +9,14 @@ class DesignOptionPolicy
 {
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create design option','web');
+        return $user->hasPermissionTo('create design option', 'web');
     }
     public function update(User $user): bool
     {
-        return $user->hasPermissionTo('update design option','web');
+        return $user->hasPermissionTo('update design option', 'web');
     }
     public function delete(User $user): bool
     {
-        return $user->hasPermissionTo('delete design option','web');
+        return $user->hasPermissionTo('delete design option', 'web');
     }
 }
