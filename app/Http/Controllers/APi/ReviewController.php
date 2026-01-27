@@ -21,20 +21,20 @@ class ReviewController extends Controller
     }
     public function store(StoreReviewRequest $request)
     {
-        Gate::authorize('create', [Auth::user(), Order::find($request->order_id)]);
+        $order = Order::findOrFail($request->order_id);
+        Gate::authorize('create', [Review::class, $order]);
         $review = $this->reviewservice->createReview($request->validated());
         return $this->success($review,  'Review created successfully', 200);
     }
     public function update(Review $review, updateReviewRequest $request)
     {
-        $user= Auth::user();
-        Gate::authorize('update', [$user, Review::class]);
+        Gate::authorize('update', $review);
         $review = $this->reviewservice->updateReview($review, $request->validated());
         return $this->success($review,  'Review updated successfully', 200);
     }
     public function delete(Review $review)
     {
-        Gate::authorize('delete', [Auth::user(), Review::class]);
+        Gate::authorize('delete', $review);
         $review = $this->reviewservice->deleteReview($review);
         return $this->success($review,  'Review deleted successfully', 200);
     }
