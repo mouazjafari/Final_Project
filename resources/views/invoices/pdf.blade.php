@@ -97,8 +97,10 @@
     <div class="section-title">Shipping Address</div>
     <table class="info-table">
         <tr>
-            <td><strong>Street:</strong> {{ $invoice->order->street }}</td>
-            <td><strong>House Number:</strong> {{ $invoice->order->house_number }}</td>
+            <td><strong>City:</strong> {{ $invoice->order->address->city->name }}</td>
+            <td><strong>Area:</strong> {{ $invoice->order->address->area }}</td>
+            <td><strong>Street:</strong> {{ $invoice->order->address->street }}</td>
+            <td><strong>Langtude - Longitude:</strong> {{ $invoice->order->address->Langitude - $invoice->order->address->Longitude}}</td>
         </tr>
     </table>
 

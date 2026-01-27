@@ -25,7 +25,7 @@ class InvoiceService
             'invoice_number' => 'INV-' . Date::now()->format('YmdHis') . '-' . $order->id,
             'total' => $order->total_price
         ]);
-        $invoice->load('order.design');
+        $invoice->load(['order.design', 'order.user', 'order.coupon']); // تحميل العلاقة مع الكوبون
         $pdf = Pdf::loadView('invoices.pdf', [
             'invoice' => $invoice
         ]);
