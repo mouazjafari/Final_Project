@@ -21,7 +21,7 @@ class RoleController extends Controller
 
     public function index()
     {
-        // Gate::authorize('viewAny', Role::class);
+        Gate::authorize('viewAny', Role::class);
 
         $roles = $this->roleService->getAllRoles();
 
@@ -30,7 +30,7 @@ class RoleController extends Controller
 
     public function create()
     {
-        // Gate::authorize('create', Role::class);
+        Gate::authorize('create', Role::class);
 
         $permissions = Permission::all();
 
@@ -39,7 +39,7 @@ class RoleController extends Controller
 
     public function store(CreateRoleRequest $request)
     {
-        // Gate::authorize('create', Role::class);
+        Gate::authorize('create', Role::class);
 
         try {
             $this->roleService->createRole($request->validated());
@@ -56,7 +56,7 @@ class RoleController extends Controller
 
     public function edit($id)
     {
-        // Gate::authorize('update', Role::class);
+        Gate::authorize('update', Role::class);
 
         $role = Role::with('permissions')->findOrFail($id);
         $permissions = Permission::all();
@@ -66,7 +66,7 @@ class RoleController extends Controller
 
     public function update(UpdateRoleRequest $request, $id)
     {
-        // Gate::authorize('update', Role::class);
+        Gate::authorize('update', Role::class);
 
         try {
             $role = Role::findOrFail($id);
@@ -84,7 +84,7 @@ class RoleController extends Controller
 
     public function destroy($id)
     {
-        // Gate::authorize('delete', Role::class);
+        Gate::authorize('delete', Role::class);
 
         try {
             $role = Role::findOrFail($id);

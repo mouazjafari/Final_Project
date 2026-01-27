@@ -126,6 +126,13 @@ class PermissionSeeder extends Seeder
                 'manage design options',
                 'view reviews',
                 'control reviews',
+                'view permissions',
+                'create permissions',
+                'delete permissions',
+                'view roles',
+                'create roles',
+                'edit roles',
+                'delete roles',
                 'send notification'
             ]
         ];

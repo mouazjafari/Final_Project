@@ -19,7 +19,7 @@ class PermissionController extends Controller
 
     public function index()
     {
-        // Gate::authorize('viewAny', Permission::class);
+        Gate::authorize('viewAny', Permission::class);
 
         $permissions = $this->permissionService->getAllPermissions();
 
@@ -28,7 +28,7 @@ class PermissionController extends Controller
 
     public function store(CreatePermissionRequest $request)
     {
-        // Gate::authorize('create', Permission::class);
+        Gate::authorize('create', Permission::class);
 
         try {
             $this->permissionService->createPermission($request->validated());
@@ -45,7 +45,7 @@ class PermissionController extends Controller
 
     public function destroy($id)
     {
-        // Gate::authorize('delete', Permission::class);
+        Gate::authorize('delete', Permission::class);
 
         try {
             $permission = Permission::findOrFail($id);
