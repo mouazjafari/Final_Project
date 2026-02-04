@@ -80,8 +80,8 @@
 
 .search-box input:focus {
     outline: none;
-    border-color: #2c3e50;
-    box-shadow: 0 0 0 3px rgba(44,62,80,0.1);
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
 .filter-select {
@@ -95,7 +95,7 @@
 
 .filter-select:focus {
     outline: none;
-    border-color: #2c3e50;
+    border-color: #3498db;
 }
 
 /* ==================== Coupons Grid ==================== */

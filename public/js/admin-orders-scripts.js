@@ -9,7 +9,7 @@ function showOrderDetails(orderId) {
     modalBody.innerHTML = `
         <div class="loading-spinner">
             <div style="display: inline-block; width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-            <p style="margin-top: 1rem; color: #667eea; font-weight: 600;">جاري تحميل التفاصيل...</p>
+            <p style="margin-top: 1rem; color: #667eea; font-weight: 600;">${__('loadingDetails')}</p>
         </div>
     `;
 
@@ -22,10 +22,10 @@ function showOrderDetails(orderId) {
             const order = data.order;
 
             const statusConfig = {
-                'pending': { text: 'قيد الانتظار', icon: '⏳', color: '#f59e0b', bg: '#fef3c7' },
-                'processing': { text: 'قيد المعالجة', icon: '🔄', color: '#3b82f6', bg: '#dbeafe' },
-                'completed': { text: 'اكتمل', icon: '✅', color: '#10b981', bg: '#d1fae5' },
-                'cancelled': { text: 'ملغي', icon: '❌', color: '#ef4444', bg: '#fee2e2' }
+                'pending': { text: __('orderStatus.pending'), icon: '⏳', color: '#f59e0b', bg: '#fef3c7' },
+                'processing': { text: __('orderStatus.processing'), icon: '🔄', color: '#3b82f6', bg: '#dbeafe' },
+                'completed': { text: __('orderStatus.completed'), icon: '✅', color: '#10b981', bg: '#d1fae5' },
+                'cancelled': { text: __('orderStatus.cancelled'), icon: '❌', color: '#ef4444', bg: '#fee2e2' }
             };
 
             const status = statusConfig[order.status] || statusConfig['pending'];
@@ -36,7 +36,7 @@ function showOrderDetails(orderId) {
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                         <div>
                             <h2 style="margin: 0 0 0.5rem 0; font-size: 1.8rem; font-weight: 700;">
-                                🛒 طلب رقم #${order.id}
+                                🛒 ${__('orderNumber')} #${order.id}
                             </h2>
                             <p style="margin: 0; opacity: 0.9; font-size: 0.95rem;">
                                 📅 ${order.created_at}
@@ -62,18 +62,18 @@ function showOrderDetails(orderId) {
                                 👤
                             </div>
                             <div>
-                                <h3 style="margin: 0; color: #1f2937; font-size: 1.2rem; font-weight: 700;">معلومات العميل</h3>
+                                <h3 style="margin: 0; color: #1f2937; font-size: 1.2rem; font-weight: 700;">${__('customerInfo')}</h3>
                             </div>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 0.8rem;">
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <span style="font-size: 1.2rem;">👨‍💼</span>
-                                <span style="color: #6b7280; font-size: 0.9rem;">الاسم:</span>
+                                <span style="color: #6b7280; font-size: 0.9rem;">${__('customerName')}:</span>
                                 <strong style="color: #1f2937; margin-right: auto;">${order.user.name}</strong>
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <span style="font-size: 1.2rem;">📧</span>
-                                <span style="color: #6b7280; font-size: 0.9rem;">البريد:</span>
+                                <span style="color: #6b7280; font-size: 0.9rem;">${__('email')}:</span>
                                 <strong style="color: #1f2937; margin-right: auto; font-size: 0.85rem;">${order.user.email}</strong>
                             </div>
                         </div>
@@ -86,18 +86,18 @@ function showOrderDetails(orderId) {
                                 📍
                             </div>
                             <div>
-                                <h3 style="margin: 0; color: #1f2937; font-size: 1.2rem; font-weight: 700;">عنوان التوصيل</h3>
+                                <h3 style="margin: 0; color: #1f2937; font-size: 1.2rem; font-weight: 700;">${__('deliveryAddress')}</h3>
                             </div>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 0.8rem;">
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <span style="font-size: 1.2rem;">🏙️</span>
-                                <span style="color: #6b7280; font-size: 0.9rem;">المدينة:</span>
+                                <span style="color: #6b7280; font-size: 0.9rem;">${__('city')}:</span>
                                 <strong style="color: #1f2937; margin-right: auto;">${order.address.city}</strong>
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <span style="font-size: 1.2rem;">🛣️</span>
-                                <span style="color: #6b7280; font-size: 0.9rem;">الشارع:</span>
+                                <span style="color: #6b7280; font-size: 0.9rem;">${__('street')}:</span>
                                 <strong style="color: #1f2937; margin-right: auto;">${order.address.street}</strong>
                             </div>
                         </div>
@@ -109,7 +109,7 @@ function showOrderDetails(orderId) {
                     <div style="display: flex; align-items: start; gap: 1rem;">
                         <span style="font-size: 2rem;">📝</span>
                         <div>
-                            <h4 style="margin: 0 0 0.5rem 0; color: #92400e; font-weight: 700;">ملاحظات الطلب:</h4>
+                            <h4 style="margin: 0 0 0.5rem 0; color: #92400e; font-weight: 700;">${__('orderNotes')}:</h4>
                             <p style="margin: 0; color: #78350f; line-height: 1.6; font-style: italic;">${order.notes}</p>
                         </div>
                     </div>
@@ -119,22 +119,22 @@ function showOrderDetails(orderId) {
                 <!-- Design Orders Section -->
                 <div style="background: #f9fafb; border-radius: 15px; padding: 2rem; border: 2px solid #e5e7eb;">
                     <h3 style="margin: 0 0 1.5rem 0; color: #1f2937; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 2rem;">🎨</span> تفاصيل التصاميم
+                        <span style="font-size: 2rem;">🎨</span> ${__('designDetails')}
                     </h3>
 
                     ${order.designOrders && order.designOrders.length > 0 ?
                         order.designOrders.map((doItem, index) => {
-                            let designName = 'غير محدد';
+                            let designName = __('undefined');
                             try {
-                                const name = doItem.design_name || 'غير محدد';
+                                const name = doItem.design_name || __('undefined');
                                 if (typeof name === 'string' && name.startsWith('{')) {
                                     const parsed = JSON.parse(name);
-                                    designName = parsed.ar || parsed.en || 'غير محدد';
+                                    designName = parsed.ar || parsed.en || __('undefined');
                                 } else {
                                     designName = name;
                                 }
                             } catch(e) {
-                                designName = doItem.design_name || 'غير محدد';
+                                designName = doItem.design_name || __('undefined');
                             }
 
                             let imageHTML = '';

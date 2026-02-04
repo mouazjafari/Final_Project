@@ -1,5 +1,5 @@
 @extends('admin.layouts.admin-layout')
-@section('title', 'إدارة الأدوار - لوحة التحكم')
+@section('title', __('admin.roles_title'))
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/roles-permissions-styles.css') }}">
@@ -16,11 +16,11 @@
 
     <!-- Page Header -->
     <div class="page-header" style="background: linear-gradient(90deg,#2c3e50,#34495e);">
-        <h2>👥 إدارة الأدوار (Roles)</h2>
+        <h2>{{ __('admin.roles_management') }}</h2>
         <div class="page-stats">
-            <span class="stat-badge">الإجمالي: {{ $roles->count() }}</span>
+            <span class="stat-badge">{{ __('admin.total') }}: {{ $roles->count() }}</span>
             <a href="{{ route('admin.roles.create') }}" class="btn-add">
-                ➕ إضافة دور جديد
+                {{ __('admin.add_new_role') }}
             </a>
         </div>
     </div>
@@ -164,5 +164,6 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('js/translations.js') }}"></script>
     <script src="{{ asset('js/roles-permissions-scripts.js') }}"></script>
 @endpush

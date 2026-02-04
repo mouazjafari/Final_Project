@@ -1,5 +1,5 @@
 @extends('admin.layouts.admin-layout')
-@section('title', 'إدارة خيارات التصميم - لوحة التحكم')
+@section('title', __('admin.design_options_title'))
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/design-options-styles.css') }}">
@@ -29,12 +29,14 @@
     @endif
     <!-- Page Header -->
     <div class="page-header" style="background: linear-gradient(90deg,#2c3e50,#34495e);">
-        <h2>🎨 إدارة خيارات التصميم</h2>
+        <h2>{{ __('admin.design_options_management') }}</h2>
         <div class="page-stats">
-            <span class="stat-badge">إجمالي: {{ $designOptions->count() ?? 0 }}</span>
-            <button class="add-btn" onclick="openAddModal()">
-                ➕ إضافة خيار جديد
-            </button>
+            <span class="stat-badge">{{ __('admin.total') }}: {{ $designOptions->count() ?? 0 }}</span>
+            @if(auth()->user()->hasPermissionTo('create design option', 'web'))
+                <button class="add-btn" onclick="openAddModal()">
+                    {{ __('admin.add_new_option') }}
+                </button>
+            @endif
         </div>
     </div>
 
@@ -42,10 +44,10 @@
     <div class="filter-section">
         <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="ابحث عن خيار تصميم...">
+            <input type="text" id="searchInput" placeholder="{{ __('admin.search_design_option') }}">
         </div>
         <select class="filter-select" id="typeFilter">
-            <option value="">كل الأنواع</option>
+            <option value="">{{ __('admin.all_types') }}</option>
             <option value="color">لون (Color)</option>
             <option value="sleeve">كم (Sleeve)</option>
             <option value="dome">قبة (Dome)</option>
@@ -97,14 +99,18 @@
                 </div>
 
                 <div class="card-actions">
-                    <button class="action-btn edit-btn"
-                        onclick="openEditModal({{ $option->id }}, '{{ $option->getTranslation('name', 'ar') }}', '{{ $option->getTranslation('name', 'en') }}', '{{ $option->type }}')">
-                        ✏️ تعديل
-                    </button>
-                    <button class="action-btn delete-btn"
-                        onclick="confirmDelete({{ $option->id }}, '{{ $option->getTranslation('name', 'ar') }}')">
-                        🗑️ حذف
-                    </button>
+                    @if(auth()->user()->hasPermissionTo('update design option', 'web'))
+                        <button class="action-btn edit-btn"
+                            onclick="openEditModal({{ $option->id }}, '{{ $option->getTranslation('name', 'ar') }}', '{{ $option->getTranslation('name', 'en') }}', '{{ $option->type }}')">
+                            ✏️ تعديل
+                        </button>
+                    @endif
+                    @if(auth()->user()->hasPermissionTo('delete design option', 'web'))
+                        <button class="action-btn delete-btn"
+                            onclick="confirmDelete({{ $option->id }}, '{{ $option->getTranslation('name', 'ar') }}')">
+                            🗑️ حذف
+                        </button>
+                    @endif
                 </div>
             </div>
         @endforeach
@@ -175,5 +181,6 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('js/translations.js') }}"></script>
     <script src="{{ asset('js/design-options-scripts.js') }}"></script>
 @endpush

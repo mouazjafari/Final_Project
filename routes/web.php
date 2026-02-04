@@ -11,6 +11,8 @@ use App\Http\Controllers\Web\Admin\PermissionController;
 use App\Http\Controllers\Web\Admin\RoleController;
 use App\Http\Controllers\Web\Admin\UserController;
 use App\Http\Controllers\Web\Admin\WalletController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\LanguageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,6 +25,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('login');
 });
+
+// تبديل اللغة
+Route::post('/language/switch', [LanguageController::class, 'switch'])->name('language.switch');
 
 /*
 |--------------------------------------------------------------------------
@@ -50,15 +55,26 @@ Route::prefix('admin')->name('admin.')->group(function () {
     */
     Route::middleware(['auth', 'admin'])->group(function () {
 
-        // Dashboard
-        Route::get('/dashboard', [DashboardController::class, 'index'])
-            ->name('dashboard');
+        // Dashboard - يتطلب صلاحية خاصة
+        Route::middleware(['dashboard.access'])->group(function () {
+            Route::get('/dashboard', [DashboardController::class, 'index'])
+                ->name('dashboard');
+        });
 
         // Addresses
         Route::get('/dashboard/address', [AddressController::class, 'index'])
             ->name('address');
 
-        // Users
+        // Users Management
+        Route::prefix('users')->name('users.')->group(function () {
+            Route::get('/', [UserController::class, 'index'])->name('index');
+            Route::get('/create', [UserController::class, 'create'])->name('create');
+            Route::post('/', [UserController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
+            Route::put('/{id}/role', [UserController::class, 'updateRole'])->name('updateRole');
+        });
+
+        // Backward compatibility route
         Route::get('/dashboard/user', [UserController::class, 'index'])
             ->name('users');
 
@@ -133,6 +149,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/', [PermissionController::class, 'store'])->name('store');
             Route::delete('/{id}', [PermissionController::class, 'destroy'])->name('destroy');
         });
+
+        // Notifications Routes
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])
+            ->name('notifications.read');
+
+        Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])
+            ->name('notifications.markAllRead');
     });
 });
 Route::get('/stripe/success', function () {

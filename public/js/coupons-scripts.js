@@ -40,7 +40,7 @@ function filterCoupons() {
 // ==================== Toggle Status ====================
 
 async function toggleStatus(couponId) {
-    if (!confirm('هل أنت متأكد من تغيير حالة الكوبون؟')) {
+    if (!confirm(__('changeCouponStatusConfirm'))) {
         return;
     }
 
@@ -59,11 +59,11 @@ async function toggleStatus(couponId) {
             showSuccessMessage(data.message);
             setTimeout(() => location.reload(), 1000);
         } else {
-            showErrorMessage(data.message || 'حدث خطأ أثناء التحديث');
+            showErrorMessage(data.message || __('updateError'));
         }
     } catch (error) {
         console.error('Error:', error);
-        showErrorMessage('حدث خطأ في الاتصال بالخادم');
+        showErrorMessage(__('connectionError'));
     }
 }
 

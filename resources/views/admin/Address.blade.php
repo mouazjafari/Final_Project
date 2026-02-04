@@ -1,6 +1,6 @@
 @extends('admin.layouts.admin-layout')
 
-@section('title', 'إدارة العناوين - لوحة التحكم')
+@section('title', __('admin.addresses_title'))
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/addresses-styles.css') }}">
@@ -9,9 +9,9 @@
 @section('content')
     <!-- Page Header -->
     <div class="page-header" style="background: linear-gradient(90deg,#2c3e50,#34495e);">
-        <h2>📍 إدارة عناوين التوصيل</h2>
+        <h2>{{ __('admin.addresses_management') }}</h2>
         <div class="page-stats">
-            <span class="stat-badge">إجمالي: {{ $addresses->count() ?? 0 }}</span>
+            <span class="stat-badge">{{ __('admin.total') }}: {{ $addresses->count() ?? 0 }}</span>
         </div>
     </div>
 
@@ -19,11 +19,11 @@
     <div class="filter-section">
         <div class="search-box">
             {{-- <span class="search-icon">🔍</span> --}}
-            <input type="text" id="searchInput" placeholder="ابحث عن عنوان أو اسم عميل...">
+            <input type="text" id="searchInput" placeholder="{{ __('admin.search_address_customer') }}">
         </div>
         <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchCityInput" placeholder="ابحث عن المدينة">
+            <input type="text" id="searchCityInput" placeholder="{{ __('admin.search_city') }}">
         </div>
 
     </div>
@@ -41,27 +41,27 @@
                 </div>
                 <div class="address-details">
                     <div class="address-row">
-                        <span class="address-label">المدينة:</span>
+                        <span class="address-label">{{ __('admin.city') }}:</span>
                         <span class="address-value">{{ $address->city->getTranslation('name', 'ar') }}</span>
                     </div>
                     <div class="address-row">
-                        <span class="address-label">الحي:</span>
+                        <span class="address-label">{{ __('admin.area') }}:</span>
                         <span class="address-value">{{ $address->area }}</span>
                     </div>
                     <div class="address-row">
-                        <span class="address-label">الشارع:</span>
+                        <span class="address-label">{{ __('admin.street') }}:</span>
                         <span class="address-value">{{ $address->street }}</span>
                     </div>
                     <div class="address-row">
-                        <span class="address-label">الطول:</span>
+                        <span class="address-label">{{ __('admin.longitude') }}:</span>
                         <span class="address-value">{{ $address->Longitude ?? '-' }}</span>
                     </div>
                     <div class="address-row">
-                        <span class="address-label">العرض:</span>
+                        <span class="address-label">{{ __('admin.latitude') }}:</span>
                         <span class="address-value">{{ $address->Langitude ?? '-' }}</span>
                     </div>
                     <div class="address-row">
-                        <span class="address-label">ملاحظات:</span>
+                        <span class="address-label">{{ __('admin.notes') }}:</span>
                         <span class="address-value">{{ $address->notes ?? '-' }}</span>
                     </div>
                 </div>
@@ -71,5 +71,6 @@
 @endsection
 
 @push('scripts')
+<script src="{{ asset('js/translations.js') }}"></script>
 <script src="{{ asset('js/addresses-scripts.js') }}"></script>
 @endpush

@@ -1,5 +1,5 @@
 @extends('admin.layouts.admin-layout')
-@section('title', 'إدارة الصلاحيات - لوحة التحكم')
+@section('title', __('admin.permissions_title'))
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/roles-permissions-styles.css') }}">
@@ -16,11 +16,11 @@
 
     <!-- Page Header -->
     <div class="page-header" style="background: linear-gradient(90deg,#2c3e50,#34495e);">
-        <h2>🔐 إدارة الصلاحيات (Permissions)</h2>
+        <h2>{{ __('admin.permissions_management') }}</h2>
         <div class="page-stats">
-            <span class="stat-badge">الإجمالي: {{ $permissions->count() }}</span>
+            <span class="stat-badge">{{ __('admin.total') }}: {{ $permissions->count() }}</span>
             <button class="btn-add" onclick="openAddModal()">
-                ➕ إضافة صلاحية جديدة
+                {{ __('admin.add_new_permission') }}
             </button>
         </div>
     </div>
@@ -166,5 +166,6 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('js/translations.js') }}"></script>
     <script src="{{ asset('js/roles-permissions-scripts.js') }}"></script>
 @endpush

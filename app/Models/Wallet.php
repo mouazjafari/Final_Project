@@ -34,7 +34,7 @@ class Wallet extends Model
         $this->balance += $amount;
         $this->save();
 
-        return $this->transactions()->create([
+        $transaction = $this->transactions()->create([
             'admin_id' => $adminId,
             'type' => 'deposit',
             'amount' => $amount,
@@ -42,6 +42,8 @@ class Wallet extends Model
             'balance_after' => $this->balance,
             'notes' => $notes,
         ]);
+
+        return $transaction;
     }
 
     // سحب رصيد
@@ -58,7 +60,7 @@ class Wallet extends Model
         $this->balance -= $amount;
         $this->save();
 
-        return $this->transactions()->create([
+        $transaction = $this->transactions()->create([
             'admin_id' => $adminId,
             'type' => 'withdraw',
             'amount' => $amount,
@@ -66,5 +68,7 @@ class Wallet extends Model
             'balance_after' => $this->balance,
             'notes' => $notes,
         ]);
+
+        return $transaction;
     }
 }

@@ -32,7 +32,8 @@ class RoleController extends Controller
     {
         Gate::authorize('create', Role::class);
 
-        $permissions = Permission::all();
+        // عرض صلاحيات الـ web فقط
+        $permissions = Permission::where('guard_name', 'web')->get();
 
         return view('admin.roles.create', compact('permissions'));
     }
@@ -59,7 +60,8 @@ class RoleController extends Controller
         Gate::authorize('update', Role::class);
 
         $role = Role::with('permissions')->findOrFail($id);
-        $permissions = Permission::all();
+        // عرض صلاحيات الـ web فقط
+        $permissions = Permission::where('guard_name', 'web')->get();
 
         return view('admin.roles.edit', compact('role', 'permissions'));
     }

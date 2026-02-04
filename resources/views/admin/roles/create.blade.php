@@ -1,5 +1,5 @@
 @extends('admin.layouts.admin-layout')
-@section('title', 'إنشاء دور جديد - لوحة التحكم')
+@section('title', app()->getLocale() == 'ar' ? 'إنشاء دور جديد - لوحة التحكم' : 'Create New Role - Dashboard')
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/roles-permissions-styles.css') }}">
@@ -22,9 +22,9 @@
 
     <!-- Page Header -->
     <div class="page-header" style="background: linear-gradient(90deg,#2c3e50,#34495e);">
-        <h2>➕ إنشاء دور جديد</h2>
+        <h2>➕ {{ app()->getLocale() == 'ar' ? 'إنشاء دور جديد' : 'Create New Role' }}</h2>
         <a href="{{ route('admin.roles.index') }}" class="btn-back">
-            ← العودة
+            {{ app()->getLocale() == 'ar' ? '← العودة' : '← Back' }}
         </a>
     </div>
 
@@ -34,32 +34,21 @@
             @csrf
 
             <div class="form-grid">
+                @php $isAr = app()->getLocale() == 'ar'; @endphp
                 <!-- اسم الدور -->
                 <div class="form-group">
-                    <label for="name">اسم الدور *</label>
+                    <label for="name">{{ $isAr ? 'اسم الدور *' : 'Role Name *' }}</label>
                     <input type="text"
                            name="name"
                            id="name"
                            value="{{ old('name') }}"
-                           placeholder="مثال: manager"
+                           placeholder="{{ $isAr ? 'مثال: manager' : 'Example: manager' }}"
                            required
                            maxlength="100">
-                    <small>استخدم أحرف صغيرة بدون مسافات (مثل: admin, manager, editor)</small>
-                </div>
-
-                <!-- Guard Name -->
-                <div class="form-group">
-                    <label for="guard_name">Guard Name *</label>
-                    <select name="guard_name" id="guard_name" required>
-                        <option value="">اختر Guard</option>
-                        <option value="api" {{ old('guard_name') === 'api' ? 'selected' : '' }}>
-                            🔌 API - للتطبيقات والموبايل
-                        </option>
-                        <option value="web" {{ old('guard_name') === 'web' ? 'selected' : '' }}>
-                            🌐 WEB - لوحة التحكم
-                        </option>
-                    </select>
-                    <small>اختر API للمستخدمين عبر التطبيق، أو WEB للوحة التحكم</small>
+                    <small>{{ $isAr ? 'استخدم أحرف صغيرة بدون مسافات (مثل: admin, manager, editor)' : 'Use lowercase letters without spaces (e.g., admin, manager, editor)' }}</small>
+                    <small style="display: block; margin-top: 5px; color: #3498db;">
+                        🌐 {{ $isAr ? 'سيتم إنشاء الدور تلقائياً لـ WEB (لوحة التحكم)' : 'Role will be automatically created for WEB (Dashboard)' }}
+                    </small>
                 </div>
             </div>
 
@@ -67,50 +56,80 @@
             <div class="permissions-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <div>
-                        <h3 style="margin: 0;">🔐 الصلاحيات (Permissions)</h3>
-                        <small style="color: #6b7280;">اختر الصلاحيات التي تريد إعطاءها لهذا الدور</small>
+                        <h3 style="margin: 0;">🔐 {{ $isAr ? 'الصلاحيات' : 'Permissions' }}</h3>
+                        <small style="color: #6b7280;">{{ $isAr ? 'اختر الصلاحيات التي تريد إعطاءها لهذا الدور' : 'Select the permissions you want to grant to this role' }}</small>
                     </div>
                     <div style="display: flex; gap: 10px;">
                         <button type="button" class="btn-secondary" onclick="selectAllPermissions()">
-                            ✅ تحديد الكل
+                            {{ $isAr ? '✅ تحديد الكل' : '✅ Select All' }}
                         </button>
                         <button type="button" class="btn-secondary" onclick="deselectAllPermissions()">
-                            ❌ إلغاء التحديد
+                            {{ $isAr ? '❌ إلغاء التحديد' : '❌ Deselect All' }}
                         </button>
                     </div>
                 </div>
 
                 <div class="permissions-grid">
                     @php
-                        $groupedPermissions = $permissions->groupBy('guard_name');
+                        // تجميع الصلاحيات حسب الفئة (بدون dashboard لأنها تلقائية)
+                        $categorizedPermissions = [
+                            'address' => $permissions->filter(function($p) { return str_contains($p->name, 'address'); }),
+                            'coupon' => $permissions->filter(function($p) { return str_contains($p->name, 'coupon'); }),
+                            'design' => $permissions->filter(function($p) { return str_contains($p->name, 'design') && !str_contains($p->name, 'option'); }),
+                            'invoice' => $permissions->filter(function($p) { return str_contains($p->name, 'invoice'); }),
+                            'notification' => $permissions->filter(function($p) { return str_contains($p->name, 'notification'); }),
+                            'option' => $permissions->filter(function($p) { return str_contains($p->name, 'design option'); }),
+                            'order' => $permissions->filter(function($p) { return str_contains($p->name, 'order'); }),
+                            'payment' => $permissions->filter(function($p) { return str_contains($p->name, 'payment'); }),
+                            'permission' => $permissions->filter(function($p) { return str_contains($p->name, 'permission'); }),
+                            'review' => $permissions->filter(function($p) { return str_contains($p->name, 'review'); }),
+                            'role' => $permissions->filter(function($p) { return str_contains($p->name, 'role'); }),
+                            'user' => $permissions->filter(function($p) { return str_contains($p->name, 'user') || str_contains($p->name, 'account') || str_contains($p->name, 'profile'); }),
+                            'wallet' => $permissions->filter(function($p) { return str_contains($p->name, 'wallet') || str_contains($p->name, 'transaction'); }),
+                        ];
+
+                        $isArabic = app()->getLocale() == 'ar';
+                        $categoryNames = [
+                            'address' => $isArabic ? 'صلاحيات العناوين' : 'Address Permissions',
+                            'coupon' => $isArabic ? 'صلاحيات الكوبونات' : 'Coupon Permissions',
+                            'design' => $isArabic ? 'صلاحيات التصاميم' : 'Designs Permissions',
+                            'invoice' => $isArabic ? 'صلاحيات الفواتير' : 'Invoice Permissions',
+                            'notification' => $isArabic ? 'صلاحيات الإشعارات' : 'Notifications Permissions',
+                            'option' => $isArabic ? 'صلاحيات خيارات التصميم' : 'Options Permissions',
+                            'order' => $isArabic ? 'صلاحيات الطلبات' : 'Order Permissions',
+                            'payment' => $isArabic ? 'صلاحيات الدفع' : 'Payment Permissions',
+                            'permission' => $isArabic ? 'إدارة الصلاحيات' : 'Permission Management',
+                            'review' => $isArabic ? 'صلاحيات التقييمات' : 'Review Permissions',
+                            'role' => $isArabic ? 'صلاحيات الأدوار' : 'Role Permissions',
+                            'user' => $isArabic ? 'صلاحيات المستخدمين' : 'User Permissions',
+                            'wallet' => $isArabic ? 'صلاحيات المحفظة' : 'Wallet Permissions',
+                        ];
                     @endphp
 
-                    @foreach($groupedPermissions as $guard => $perms)
-                        <div class="guard-group">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                <h4 class="guard-title" style="margin: 0;">
-                                    @if($guard === 'api')
-                                        🔌 API Permissions
-                                    @else
-                                        🌐 WEB Permissions
-                                    @endif
-                                </h4>
-                                <small style="color: #6b7280;">{{ $perms->count() }} صلاحية</small>
-                            </div>
+                    @foreach($categorizedPermissions as $categoryKey => $perms)
+                        @if($perms->count() > 0)
+                            <div class="permission-category">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                    <h4 style="margin: 0; color: #2c3e50; font-size: 0.95rem;">
+                                        🛡️ {{ $categoryNames[$categoryKey] }}
+                                    </h4>
+                                    <small style="color: #6b7280;">({{ $perms->count() }}/{{ $perms->count() }})</small>
+                                </div>
 
-                            <div class="permissions-list">
-                                @foreach($perms as $permission)
-                                    <label class="permission-checkbox">
-                                        <input type="checkbox"
-                                               name="permissions[]"
-                                               value="{{ $permission->id }}"
-                                               class="permission-input guard-{{ $guard }}"
-                                               {{ in_array($permission->id, old('permissions', [])) ? 'checked' : '' }}>
-                                        <span class="checkbox-label">{{ $permission->name }}</span>
-                                    </label>
-                                @endforeach
+                                <div class="permissions-list" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                    @foreach($perms as $permission)
+                                        <label class="permission-badge">
+                                            <input type="checkbox"
+                                                   name="permissions[]"
+                                                   value="{{ $permission->id }}"
+                                                   class="permission-input"
+                                                   {{ in_array($permission->id, old('permissions', [])) ? 'checked' : '' }}>
+                                            <span class="badge-text">✓ {{ $permission->name }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
                             </div>
-                        </div>
+                        @endif
                     @endforeach
                 </div>
 
@@ -137,12 +156,10 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('js/translations.js') }}"></script>
     <script src="{{ asset('js/roles-permissions-scripts.js') }}"></script>
     <script>
-        // Select/Deselect All Permissions
-        function selectAllPermissions() {
-            document.querySelectorAll('.permission-input').forEach(checkbox => {
-                checkbox.checked = true;
+
             });
         }
 
@@ -155,19 +172,11 @@
         // Form Validation
         document.getElementById('roleForm')?.addEventListener('submit', function(e) {
             const name = document.getElementById('name').value.trim();
-            const guardName = document.getElementById('guard_name').value;
 
             if (!name) {
                 e.preventDefault();
                 alert('⚠️ الرجاء إدخال اسم الدور');
                 document.getElementById('name').focus();
-                return false;
-            }
-
-            if (!guardName) {
-                e.preventDefault();
-                alert('⚠️ الرجاء اختيار Guard Name');
-                document.getElementById('guard_name').focus();
                 return false;
             }
 

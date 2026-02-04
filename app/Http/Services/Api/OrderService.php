@@ -7,6 +7,9 @@ use App\Http\Enum\OrderStatusEnum;
 use App\Models\Address;
 use App\Models\Design;
 use App\Models\Order;
+use App\Models\User;
+use App\Notifications\OrderCreatedNotification;
+use App\Notifications\OrderStatusUpdatedNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -39,7 +42,9 @@ class OrderService
                 if (is_null($address)) {
                     throw new GeneralException('Address isn\'t yours', 404);
                 }
-                if (is_null($order)) {
+                $isNewOrder = is_null($order);
+
+                if ($isNewOrder) {
                     $order = Order::create([
                         'user_id' => Auth::id(),
                         'address_id' => $data['address_id'],
@@ -98,15 +103,29 @@ class OrderService
                 $optionIds = $data['options'];
 
                 // التحقق إنو كل option تابع للـ design
-                $validOptionCount = $design->designOptions()
+                $selectedOptions = $design->designOptions()
                     ->whereIn('design_options.id', $optionIds)
-                    ->count();
+                    ->get();
 
-                if ($validOptionCount !== count($optionIds)) {
+                if ($selectedOptions->count() !== count($optionIds)) {
                     throw new GeneralException(
                         'One or more options do not belong to this design',
                         422
                     );
+                }
+
+                // التحقق من عدم اختيار أكثر من option من نفس النوع
+                $typeCount = $selectedOptions->groupBy('type')->map(function ($group) {
+                    return $group->count();
+                });
+
+                foreach ($typeCount as $type => $count) {
+                    if ($count > 1) {
+                        throw new GeneralException(
+                            "You can only select one option per type. Multiple options selected for type: {$type}",
+                            422
+                        );
+                    }
                 }
 
                 // إدخال الـ options في pivot
@@ -122,7 +141,26 @@ class OrderService
                 $order->total_price += $design->price * $data['quantity'];
                 $order->save();
 
-                $order->load('address', 'design', 'designOrders.options');
+                $order->load('user', 'address', 'design', 'designOrders.options');
+
+                // إرسال إشعار إذا كان طلب جديد
+                if ($isNewOrder) {
+                    // إرسال إشعار لصاحب التصميم
+                    $design->user->notify(new OrderCreatedNotification($order));
+
+                    // إرسال إشعار للمستخدمين اللي عندهم صلاحية عرض الطلبات في الـ web
+                    $permission = \Spatie\Permission\Models\Permission::where('name', 'view orders')
+                        ->where('guard_name', 'web')
+                        ->first();
+
+                    if ($permission) {
+                        $usersWithPermission = $permission->users;
+                        foreach ($usersWithPermission as $user) {
+                            $user->notify(new OrderCreatedNotification($order));
+                        }
+                    }
+                }
+
                 return $order;
             } catch (\Exception $e) {
                 Log::error('Error creating design: ' . $e->getMessage());
@@ -265,7 +303,7 @@ class OrderService
                 $order->save();
 
                 // تحميل العلاقات
-                $order->load('address', 'design','designOrders.options');
+                $order->load('address', 'design', 'designOrders.options');
 
                 return $order;
             } catch (\Exception $e) {
@@ -277,8 +315,13 @@ class OrderService
 
     public function cancelOrder($order)
     {
+        $oldStatus = $order->status;
         $order->status = OrderStatusEnum::Cancelled;
         $order->save();
+
+        // إرسال إشعار بتحديث حالة الطلب
+        $order->user->notify(new OrderStatusUpdatedNotification($order, $oldStatus));
+
         return $order;
     }
 }

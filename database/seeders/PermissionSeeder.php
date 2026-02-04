@@ -18,10 +18,12 @@ class PermissionSeeder extends Seeder
         foreach ($this->permissions() as $guard => $names) {
             $this->seed_for_guard($guard, $names);
         }
-        $userRole = Role::create(
-            ['name' => RoleUserEnum::User, 'guard_name' => 'api']
+
+        // استخدام firstOrCreate بدلاً من create لتجنب الأخطاء
+        $userRole = Role::firstOrCreate(
+            ['name' => RoleUserEnum::User->value, 'guard_name' => 'api']
         );
-        $userRole->givePermissionTo(
+        $userRole->syncPermissions(
             [
                 'create profile',
                 'update profile',
@@ -44,12 +46,16 @@ class PermissionSeeder extends Seeder
                 'view notifications',
             ]
         );
-        $AdminRole = Role::create(
-            ['name' => RoleUserEnum::Admin, 'guard_name' => 'web']
+
+        $AdminRole = Role::firstOrCreate(
+            ['name' => RoleUserEnum::Admin->value, 'guard_name' => 'web']
         );
-        $AdminRole->givePermissionTo(
+        $AdminRole->syncPermissions(
             [
+                'access dashboard',
                 'View all users',
+                'create users',
+                'assign roles to users',
                 'disable/delete accounts',
                 'view orders',
                 'change status orders',
@@ -72,10 +78,11 @@ class PermissionSeeder extends Seeder
                 'send notification'
             ]
         );
-        $SuperAdminRole = Role::create(
-            ['name' => RoleUserEnum::SuperAdmin, 'guard_name' => 'web']
+
+        $SuperAdminRole = Role::firstOrCreate(
+            ['name' => RoleUserEnum::SuperAdmin->value, 'guard_name' => 'web']
         );
-        $SuperAdminRole->givePermissionTo(
+        $SuperAdminRole->syncPermissions(
             Permission::where('guard_name', 'web')->get()
         );
     }
@@ -106,7 +113,10 @@ class PermissionSeeder extends Seeder
                 'view notifications',
             ],
             'web' => [
+                'access dashboard',
                 'View all users',
+                'create users',
+                'assign roles to users',
                 'disable/delete accounts',
                 'view orders',
                 'change status orders',

@@ -61,29 +61,74 @@
                     $selectedPermissions = old('permissions', $role->permissions->pluck('id')->toArray());
                     // ✅ عرض بس الـ permissions اللي عندهم نفس الـ guard
                     $rolePermissions = $permissions->where('guard_name', $role->guard_name);
+
+                    // تجميع الصلاحيات حسب الفئة (بدون dashboard لأنها تلقائية)
+                    $categorizedPermissions = [
+                        'address' => $rolePermissions->filter(function($p) { return str_contains($p->name, 'address'); }),
+                        'coupon' => $rolePermissions->filter(function($p) { return str_contains($p->name, 'coupon'); }),
+                        'design' => $rolePermissions->filter(function($p) { return str_contains($p->name, 'design') && !str_contains($p->name, 'option'); }),
+                        'invoice' => $rolePermissions->filter(function($p) { return str_contains($p->name, 'invoice'); }),
+                        'notification' => $rolePermissions->filter(function($p) { return str_contains($p->name, 'notification'); }),
+                        'option' => $rolePermissions->filter(function($p) { return str_contains($p->name, 'design option'); }),
+                        'order' => $rolePermissions->filter(function($p) { return str_contains($p->name, 'order'); }),
+                        'payment' => $rolePermissions->filter(function($p) { return str_contains($p->name, 'payment'); }),
+                        'permission' => $rolePermissions->filter(function($p) { return str_contains($p->name, 'permission'); }),
+                        'review' => $rolePermissions->filter(function($p) { return str_contains($p->name, 'review'); }),
+                        'role' => $rolePermissions->filter(function($p) { return str_contains($p->name, 'role'); }),
+                        'user' => $rolePermissions->filter(function($p) { return str_contains($p->name, 'user') || str_contains($p->name, 'account') || str_contains($p->name, 'profile'); }),
+                        'wallet' => $rolePermissions->filter(function($p) { return str_contains($p->name, 'wallet') || str_contains($p->name, 'transaction'); }),
+                    ];
+
+                    $isArabic = app()->getLocale() == 'ar';
+                    $categoryNames = [
+                        'address' => $isArabic ? 'صلاحيات العناوين' : 'Address Permissions',
+                        'coupon' => $isArabic ? 'صلاحيات الكوبونات' : 'Coupon Permissions',
+                        'design' => $isArabic ? 'صلاحيات التصاميم' : 'Designs Permissions',
+                        'invoice' => $isArabic ? 'صلاحيات الفواتير' : 'Invoice Permissions',
+                        'notification' => $isArabic ? 'صلاحيات الإشعارات' : 'Notifications Permissions',
+                        'option' => $isArabic ? 'صلاحيات خيارات التصميم' : 'Options Permissions',
+                        'order' => $isArabic ? 'صلاحيات الطلبات' : 'Order Permissions',
+                        'payment' => $isArabic ? 'صلاحيات الدفع' : 'Payment Permissions',
+                        'permission' => $isArabic ? 'إدارة الصلاحيات' : 'Permission Management',
+                        'review' => $isArabic ? 'صلاحيات التقييمات' : 'Review Permissions',
+                        'role' => $isArabic ? 'صلاحيات الأدوار' : 'Role Permissions',
+                        'user' => $isArabic ? 'صلاحيات المستخدمين' : 'User Permissions',
+                        'wallet' => $isArabic ? 'صلاحيات المحفظة' : 'Wallet Permissions',
+                    ];
                 @endphp
 
                 <div class="permissions-grid">
                     @if ($rolePermissions->count() > 0)
-                        <div class="guard-group">
-                            <h4 class="guard-title">
-                                @if ($role->guard_name === 'api')
-                                    🔌 API Permissions
-                                @else
-                                    🌐 WEB Permissions
-                                @endif
-                            </h4>
+                        @foreach($categorizedPermissions as $categoryKey => $perms)
+                            @if($perms->count() > 0)
+                                <div class="permission-category">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                        <h4 style="margin: 0; color: #2c3e50; font-size: 0.95rem;">
+                                            🛡️ {{ $categoryNames[$categoryKey] }}
+                                        </h4>
+                                        @php
+                                            $selectedCount = $perms->filter(function($p) use ($selectedPermissions) {
+                                                return in_array($p->id, $selectedPermissions);
+                                            })->count();
+                                        @endphp
+                                        <small style="color: #6b7280;">({{ $selectedCount }}/{{ $perms->count() }})</small>
+                                    </div>
 
-                            <div class="permissions-list">
-                                @foreach ($rolePermissions as $permission)
-                                    <label class="permission-checkbox">
-                                        <input type="checkbox" name="permissions[]" value="{{ $permission->id }}"
-                                            {{ in_array($permission->id, $selectedPermissions) ? 'checked' : '' }}>
-                                        <span class="checkbox-label">{{ $permission->name }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
+                                    <div class="permissions-list" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                        @foreach($perms as $permission)
+                                            <label class="permission-badge">
+                                                <input type="checkbox"
+                                                       name="permissions[]"
+                                                       value="{{ $permission->id }}"
+                                                       class="permission-input"
+                                                       {{ in_array($permission->id, $selectedPermissions) ? 'checked' : '' }}>
+                                                <span class="badge-text">✓ {{ $permission->name }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+                        @endforeach
                     @else
                         <p style="text-align: center; color: #ef4444;">
                             لا توجد صلاحيات متاحة لـ {{ strtoupper($role->guard_name) }}
@@ -138,5 +183,6 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('js/translations.js') }}"></script>
     <script src="{{ asset('js/roles-permissions-scripts.js') }}"></script>
 @endpush

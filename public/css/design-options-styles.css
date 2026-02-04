@@ -29,22 +29,22 @@
     font-weight: 600;
 }
 
-.add-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.add-btn, .btn-add {
+    background: rgba(255,255,255,0.2);
     color: white;
-    border: none;
-    padding: 0.75rem 2rem;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 0.6rem 1.2rem;
     border-radius: 8px;
     cursor: pointer;
     font-size: 1rem;
     font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s;
+    text-decoration: none;
 }
 
-.add-btn:hover {
+.add-btn:hover, .btn-add:hover {
+    background: rgba(255,255,255,0.3);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
 /* Filter Section */
@@ -80,8 +80,8 @@
 
 .search-box input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
 .filter-select {
@@ -96,7 +96,7 @@
 
 .filter-select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #3498db;
 }
 
 /* Addresses Grid */

@@ -1,0 +1,717 @@
+/* ==========================================
+   🎨 Unified Admin Panel Styles
+   نظام تصميم موحد لكامل لوحة التحكم
+   ========================================== */
+
+/* ==================== Color Palette ==================== */
+:root {
+    /* Primary Colors */
+    --primary-blue: #3498db;
+    --primary-dark: #2c3e50;
+    --primary-light: #34495e;
+
+    /* Success & Active */
+    --success-green: #27ae60;
+    --success-light: #2ecc71;
+    --success-bg: #d4edda;
+    --success-text: #155724;
+
+    /* Warning */
+    --warning-orange: #f39c12;
+    --warning-light: #f1c40f;
+
+    /* Danger & Error */
+    --danger-red: #e74c3c;
+    --danger-light: #c0392b;
+    --error-bg: #f8d7da;
+    --error-text: #721c24;
+
+    /* Info */
+    --info-blue: #3498db;
+    --info-light: #5dade2;
+
+    /* Neutral Colors */
+    --white: #ffffff;
+    --gray-50: #f8f9fa;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #dfe4ea;
+    --gray-400: #cbd5e0;
+    --gray-500: #a0aec0;
+    --gray-600: #718096;
+    --gray-700: #4a5568;
+    --gray-800: #2d3748;
+    --gray-900: #1a202c;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 10px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 15px rgba(0,0,0,0.1);
+    --shadow-lg: 0 6px 24px rgba(0,0,0,0.12);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,0.15);
+
+    /* Border Radius */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 999px;
+
+    /* Spacing */
+    --space-xs: 0.5rem;
+    --space-sm: 0.75rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+
+    /* Transitions */
+    --transition-fast: all 0.2s ease;
+    --transition-normal: all 0.3s ease;
+    --transition-slow: all 0.4s ease;
+}
+
+/* ==================== Page Header (موحد) ==================== */
+.page-header {
+    background: linear-gradient(90deg, var(--primary-dark), var(--primary-light));
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-xl);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-md);
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.page-header h2 {
+    color: var(--white);
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.page-stats {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.stat-badge {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-full);
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ==================== Buttons (موحد) ==================== */
+.btn-add,
+.btn-back,
+.btn-submit,
+.btn-cancel,
+.btn-edit,
+.btn-delete,
+.add-btn {
+    padding: 0.7rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-add,
+.add-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-add:hover,
+.add-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-back {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--white);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.btn-submit {
+    background: var(--success-green);
+    color: var(--white);
+}
+
+.btn-submit:hover {
+    background: var(--success-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-cancel {
+    background: var(--gray-500);
+    color: var(--white);
+}
+
+.btn-cancel:hover {
+    background: var(--gray-600);
+    transform: translateY(-2px);
+}
+
+.btn-edit {
+    background: var(--info-blue);
+    color: var(--white);
+}
+
+.btn-edit:hover {
+    background: var(--info-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-delete {
+    background: var(--danger-red);
+    color: var(--white);
+}
+
+.btn-delete:hover {
+    background: var(--danger-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ==================== Alert Messages (موحد) ==================== */
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    animation: slideDown 0.5s ease;
+    border: 1px solid;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: var(--success-bg);
+    color: var(--success-text);
+    border-color: var(--success-green);
+}
+
+.alert-error {
+    background: var(--error-bg);
+    color: var(--error-text);
+    border-color: var(--danger-red);
+}
+
+.alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border-color: var(--warning-orange);
+}
+
+.alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border-color: var(--info-blue);
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ==================== Filter Section (موحد) ==================== */
+.filter-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+    padding: var(--space-lg);
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    min-width: 250px;
+}
+
+.search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: var(--gray-500);
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.8rem 3rem 0.8rem 1rem;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    transition: var(--transition-normal);
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.filter-select {
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    background: var(--white);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+/* ==================== Cards (موحد) ==================== */
+.card,
+.role-card,
+.user-card,
+.address-card,
+.coupon-card,
+.design-option-card,
+.order-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-normal);
+    position: relative;
+    border: 2px solid transparent;
+    min-height: 170px;
+}
+
+.card:hover,
+.role-card:hover,
+.user-card:hover,
+.address-card:hover,
+.coupon-card:hover,
+.design-option-card:hover,
+.order-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary-blue);
+}
+
+/* Card with status colors */
+.card.active,
+.card.default {
+    border-color: var(--success-green);
+    background: linear-gradient(135deg, var(--white) 0%, #f0fff4 100%);
+}
+
+.card.inactive {
+    border-color: var(--gray-400);
+    background: linear-gradient(135deg, var(--white) 0%, var(--gray-100) 100%);
+    opacity: 0.8;
+}
+
+.card.expired,
+.card.danger {
+    border-color: var(--danger-red);
+    background: linear-gradient(135deg, var(--white) 0%, #fff5f5 100%);
+}
+
+/* ==================== Card Header ==================== */
+.card-header,
+.role-header,
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-md);
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin: 0;
+}
+
+/* ==================== Badges (موحد) ==================== */
+.badge,
+.status-badge,
+.type-badge,
+.default-badge {
+    padding: 0.4rem 0.9rem;
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.badge.success,
+.status-badge.active {
+    background: var(--success-green);
+    color: var(--white);
+}
+
+.badge.warning {
+    background: var(--warning-orange);
+    color: var(--white);
+}
+
+.badge.danger,
+.status-badge.inactive {
+    background: var(--danger-red);
+    color: var(--white);
+}
+
+.badge.info,
+.type-badge {
+    background: var(--primary-blue);
+    color: var(--white);
+}
+
+.badge.neutral {
+    background: var(--gray-500);
+    color: var(--white);
+}
+
+/* ==================== Grid Layouts (موحد) ==================== */
+.roles-grid,
+.users-grid,
+.addresses-grid,
+.coupons-grid,
+.design-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+/* ==================== Table Styles (موحد) ==================== */
+.table-card,
+.permissions-table-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.table,
+.permissions-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table thead,
+.permissions-table thead {
+    background: linear-gradient(90deg, var(--primary-dark), var(--primary-light));
+}
+
+.table thead th,
+.permissions-table thead th {
+    color: var(--white);
+    padding: 1rem 1.5rem;
+    text-align: right;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.table tbody tr,
+.permissions-table tbody tr {
+    border-bottom: 1px solid var(--gray-200);
+    transition: var(--transition-fast);
+}
+
+.table tbody tr:hover,
+.permissions-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+.table tbody td,
+.permissions-table tbody td {
+    padding: 1rem 1.5rem;
+    text-align: right;
+}
+
+/* ==================== Form Styles (موحد) ==================== */
+.form-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-xl);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--gray-800);
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    transition: var(--transition-normal);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.form-group .error-text {
+    color: var(--danger-red);
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: flex-end;
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 2px solid var(--gray-200);
+}
+
+/* ==================== Info Box (موحد) ==================== */
+.info-box,
+.user-info-box {
+    background: var(--gray-50);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-xl);
+    border: 1px solid var(--gray-200);
+}
+
+.info-box h3,
+.user-info-box h3 {
+    margin: 0 0 var(--space-md) 0;
+    color: var(--primary-dark);
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-md);
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.info-item strong {
+    color: var(--gray-700);
+    font-size: 0.9rem;
+}
+
+.info-item span {
+    color: var(--gray-900);
+    font-size: 1rem;
+}
+
+/* ==================== Action Buttons (موحد) ==================== */
+.actions-group,
+.role-actions {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    border: none;
+    font-size: 1rem;
+}
+
+.btn-icon.edit {
+    background: var(--info-blue);
+    color: var(--white);
+}
+
+.btn-icon.delete {
+    background: var(--danger-red);
+    color: var(--white);
+}
+
+.btn-icon.view {
+    background: var(--gray-600);
+    color: var(--white);
+}
+
+.btn-icon:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+/* ==================== Loading & Empty States ==================== */
+.loading-state {
+    text-align: center;
+    padding: var(--space-xl);
+    color: var(--gray-600);
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--space-xl) * 2;
+    color: var(--gray-600);
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    color: var(--gray-700);
+    margin-bottom: var(--space-md);
+}
+
+/* ==================== Responsive Design ==================== */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .page-stats {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .filter-section {
+        grid-template-columns: 1fr;
+    }
+
+    .roles-grid,
+    .users-grid,
+    .addresses-grid,
+    .coupons-grid,
+    .design-options-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .form-actions .btn-submit,
+    .form-actions .btn-cancel {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ==================== Utilities ==================== */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.mt-sm { margin-top: var(--space-sm); }
+.mt-md { margin-top: var(--space-md); }
+.mt-lg { margin-top: var(--space-lg); }
+.mt-xl { margin-top: var(--space-xl); }
+
+.mb-sm { margin-bottom: var(--space-sm); }
+.mb-md { margin-bottom: var(--space-md); }
+.mb-lg { margin-bottom: var(--space-lg); }
+.mb-xl { margin-bottom: var(--space-xl); }
+
+.p-sm { padding: var(--space-sm); }
+.p-md { padding: var(--space-md); }
+.p-lg { padding: var(--space-lg); }
+.p-xl { padding: var(--space-xl); }
+
+/* ==================== Color Classes ==================== */
+.text-primary { color: var(--primary-blue); }
+.text-success { color: var(--success-green); }
+.text-danger { color: var(--danger-red); }
+.text-warning { color: var(--warning-orange); }
+.text-gray { color: var(--gray-600); }
+
+.bg-primary { background: var(--primary-blue); }
+.bg-success { background: var(--success-green); }
+.bg-danger { background: var(--danger-red); }
+.bg-warning { background: var(--warning-orange); }
+.bg-gray { background: var(--gray-100); }

@@ -15,7 +15,7 @@ class CreateRoleRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:100|unique:roles,name',
-            'guard_name' => 'required|in:api,web',
+            // guard_name تم إزالته - سيكون دائماً web
             'permissions' => 'nullable|array',
             'permissions.*' => 'integer|exists:permissions,id',
         ];
@@ -26,8 +26,6 @@ class CreateRoleRequest extends FormRequest
         return [
             'name.required' => 'اسم الصلاحية مطلوب',
             'name.unique' => 'هذا الاسم موجود مسبقاً',
-            'guard_name.required' => 'Guard Name مطلوب',
-            'guard_name.in' => 'Guard Name يجب أن يكون api أو web',
             'permissions.array' => 'الصلاحيات يجب أن تكون مصفوفة',
             'permissions.*.exists' => 'إحدى الصلاحيات غير موجودة',
         ];

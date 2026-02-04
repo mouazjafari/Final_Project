@@ -1,5 +1,5 @@
 @extends('admin.layouts.admin-layout')
-@section('title', 'إدارة الطلبات - لوحة التحكم')
+@section('title', __('admin.orders_title'))
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin-orders-styles.css') }}">
@@ -21,9 +21,9 @@
 
     <!-- Page Header -->
     <div class="page-header" style="background: linear-gradient(90deg,#2c3e50,#34495e);">
-        <h2>🛒 إدارة الطلبات</h2>
+        <h2>{{ __('admin.orders_management') }}</h2>
         <div class="page-stats">
-            <span class="stat-badge">إجمالي الطلبات: {{ $total ?? 0 }}</span>
+            <span class="stat-badge">{{ __('admin.total_orders') }}: {{ $total ?? 0 }}</span>
         </div>
     </div>
 
@@ -31,53 +31,52 @@
     <div class="filter-section">
         <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchOrderInput" placeholder="ابحث برقم الطلب...">
+            <input type="text" id="searchOrderInput" placeholder="{{ __('admin.search_order_number') }}">
         </div>
 
         <div class="search-box">
             <span class="search-icon">👤</span>
-            <input type="text" id="searchUserInput" placeholder="ابحث عن اسم العميل...">
+            <input type="text" id="searchUserInput" placeholder="{{ __('admin.search_customer_name') }}">
         </div>
 
         <select class="filter-select" id="statusFilter">
-            <option value="">كل الحالات</option>
-            <option value="pending">⏳ قيد الانتظار</option>
-            <option value="processing">🔄 قيد المعالجة</option>
-            <option value="shipped">📦 تم الشحن</option>
-            <option value="delivered">✅ تم التوصيل</option>
-            <option value="cancelled">❌ ملغي</option>
+            <option value="">{{ __('admin.all_statuses') }}</option>
+            <option value="pending">{{ __('admin.pending') }}</option>
+            <option value="processing">{{ __('admin.processing') }}</option>
+            <option value="shipped">{{ __('admin.shipped') }}</option>
+            <option value="cancelled">{{ __('admin.cancelled') }}</option>
         </select>
 
         <select class="filter-select" id="priceFilter">
-            <option value="">كل الأسعار</option>
-            <option value="0-100">أقل من 100</option>
+            <option value="">{{ __('admin.all_prices') }}</option>
+            <option value="0-100">{{ __('admin.all_prices') }} < 100</option>
             <option value="100-300">100 - 300</option>
             <option value="300-500">300 - 500</option>
-            <option value="500+">أكثر من 500</option>
+            <option value="500+">{{ __('admin.all_prices') }} > 500</option>
         </select>
     </div>
 
     <!-- Advanced Filters -->
     <div class="advanced-filters">
         <button class="toggle-filters-btn" onclick="toggleAdvancedFilters()">
-            <span id="toggleIcon">▼</span> فلاتر متقدمة
+            <span id="toggleIcon">▼</span> {{ __('admin.advanced_filters') }}
         </button>
 
         <div id="advancedFiltersContent" class="advanced-filters-content" style="display: none;">
             <div class="filters-grid">
                 <div class="filter-group">
-                    <label>📅 التاريخ من:</label>
+                    <label>{{ __('admin.date_from') }}:</label>
                     <input type="date" class="filter-select-small" id="dateFromFilter">
                 </div>
 
                 <div class="filter-group">
-                    <label>📅 التاريخ إلى:</label>
+                    <label>{{ __('admin.date_to') }}:</label>
                     <input type="date" class="filter-select-small" id="dateToFilter">
                 </div>
             </div>
 
             <button class="reset-filters-btn" onclick="resetFilters()">
-                🔄 إعادة تعيين الفلاتر
+                {{ __('admin.reset_filters') }}
             </button>
         </div>
     </div>
@@ -110,31 +109,31 @@
                 </div>
 
                 <div class="address-details">
-                    <span class="address-label">رقم الطلب : {{ $order->id }}</س>
+                    <span class="address-label">{{ __('admin.order_number') }} : {{ $order->id }}</span>
                         <div class="address-row">
-                            <span class="address-label">الحالة:</span>
+                            <span class="address-label">{{ __('admin.status') }}:</span>
                             <span class="address-value">
                                 <select class="status-select status-{{ $order->status }}"
                                     data-order-id="{{ $order->id }}"
                                     onchange="updateOrderStatus({{ $order->id }}, this.value)">
                                     <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>
-                                        ⏳ قيد الانتظار
+                                        {{ __('admin.pending') }}
                                     </option>
                                     <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>
-                                        🔄 قيد المعالجة
+                                        {{ __('admin.processing') }}
                                     </option>
                                     <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>
-                                        ✅ اكتمل
+                                        {{ __('admin.completed') }}
                                     </option>
                                     <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>
-                                        ❌ ملغي
+                                        {{ __('admin.cancelled') }}
                                     </option>
                                 </select>
                             </span>
                         </div>
 
                         <div class="address-row">
-                            <span class="address-label">الإجمالي:</span>
+                            <span class="address-label">{{ __('admin.total') }}:</span>
                             <span class="address-value price-value">{{ number_format($order->total_price, 2) }} ₪</span>
                         </div>
 
@@ -157,7 +156,7 @@
 
                         @if ($order->size)
                             <div class="address-row">
-                                <span class="address-label">المقاس:</span>
+                                <span class="address-label">{{ __('admin.size') }}:</span>
                                 <span class="address-value">
                                     @php
                                         $sizeName = is_string($order->size->name)
@@ -173,13 +172,13 @@
                         @endif
 
                         <div class="address-row">
-                            <span class="address-label">التاريخ:</span>
+                            <span class="address-label">{{ __('admin.date') }}:</span>
                             <span class="address-value">{{ $order->created_at->format('Y-m-d H:i') }}</span>
                         </div>
 
                         @if ($order->notes)
                             <div class="address-row">
-                                <span class="address-label">ملاحظات:</span>
+                                <span class="address-label">{{ __('admin.notes') }}:</span>
                                 <span class="address-value notes-text">{{ Str::limit($order->notes, 50) }}</span>
                             </div>
                         @endif
@@ -187,7 +186,7 @@
 
                 <div class="card-actions">
                     <button onclick="showOrderDetails({{ $order->id }})" class="view-btn">
-                        👁️ عرض التفاصيل
+                        {{ __('admin.view_details') }}
                     </button>
                 </div>
             </div>
@@ -197,8 +196,8 @@
     @if ($orders->isEmpty())
         <div class="empty-state">
             <div class="empty-icon">📭</div>
-            <h3>لا توجد طلبات حالياً</h3>
-            <p>لم يتم تقديم أي طلبات بعد</p>
+            <h3>{{ __('admin.no_orders') }}</h3>
+            <p>{{ __('admin.no_orders_msg') }}</p>
         </div>
     @endif
 
@@ -224,6 +223,7 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('js/translations.js') }}"></script>
     <script src="{{ asset('js/admin-orders-scripts.js') }}"></script>
 @endpush
 @push('scripts')

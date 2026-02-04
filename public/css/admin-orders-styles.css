@@ -2,11 +2,11 @@
 /* Page Header Styles */
 /* ==================== */
 .page-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(90deg, #2c3e50, #34495e);
     padding: 2rem;
-    border-radius: 15px;
+    border-radius: 12px;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     display: flex;
     justify-content: space-between;
     align-items: center;

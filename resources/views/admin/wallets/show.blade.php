@@ -1,5 +1,5 @@
 @extends('admin.layouts.admin-layout')
-@section('title', 'تفاصيل المحفظة - ' . $user->name)
+@section('title', __('admin.wallet_details') . ' - ' . $user->name)
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/wallets-styles.css') }}">
@@ -16,16 +16,16 @@
 
     <!-- Page Header -->
     <div class="page-header">
-        <h2>💰 محفظة {{ $user->name }}</h2>
+        <h2>💰 {{ __('admin.wallet_details') }} - {{ $user->name }}</h2>
         <a href="{{ route('admin.wallets.index') }}" class="btn-back">
-            ← العودة
+            ← {{ __('admin.back') }}
         </a>
     </div>
 
     <!-- Balance Card -->
     <div class="balance-card">
         <div class="balance-card-header">
-            <h3>الرصيد الحالي</h3>
+            <h3>{{ __('admin.current_balance') }}</h3>
         </div>
         <div class="balance-card-body">
             <div class="main-balance">
@@ -33,10 +33,10 @@
             </div>
             <div class="balance-actions">
                 <button class="btn-add" onclick="openAddModal()">
-                    ➕ إضافة رصيد
+                    ➕ {{ __('admin.add_balance') }}
                 </button>
                 <button class="btn-withdraw" onclick="openWithdrawModal()">
-                    ➖ سحب رصيد
+                    ➖ {{ __('admin.withdraw_balance') }}
                 </button>
             </div>
         </div>
@@ -44,20 +44,20 @@
 
     <!-- Transactions History -->
     <div class="transactions-section">
-        <h3 class="section-title">📜 سجل المعاملات</h3>
+        <h3 class="section-title">📜 {{ __('admin.transactions_log') }}</h3>
 
         @if ($transactions && $transactions->count() > 0)
             <div class="transactions-table">
                 <table>
                     <thead>
                         <tr>
-                            <th>التاريخ</th>
-                            <th>النوع</th>
-                            <th>المبلغ</th>
-                            <th>الرصيد قبل</th>
-                            <th>الرصيد بعد</th>
-                            <th>الأدمن</th>
-                            <th>ملاحظات</th>
+                            <th>{{ __('admin.transaction_date') }}</th>
+                            <th>{{ __('admin.transaction_type') }}</th>
+                            <th>{{ __('admin.amount') }}</th>
+                            <th>{{ __('admin.balance_before') }}</th>
+                            <th>{{ __('admin.balance_after') }}</th>
+                            <th>{{ __('admin.admin_name') }}</th>
+                            <th>{{ __('admin.notes') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,9 +66,9 @@
                                 <td>{{ $trans->created_at->format('Y-m-d H:i') }}</td>
                                 <td>
                                     @if ($trans->type == 'deposit')
-                                        <span class="badge badge-deposit">⬆️ إيداع</span>
+                                        <span class="badge badge-deposit">⬆️ {{ __('admin.deposit') }}</span>
                                     @else
-                                        <span class="badge badge-withdraw">⬇️ سحب</span>
+                                        <span class="badge badge-withdraw">⬇️ {{ __('admin.withdraw') }}</span>
                                     @endif
                                 </td>
                                 <td class="amount-cell {{ $trans->type }}">
@@ -77,7 +77,7 @@
                                 </td>
                                 <td>{{ number_format($trans->balance_before, 2) }} ₪</td>
                                 <td>{{ number_format($trans->balance_after, 2) }} ₪</td>
-                                <td>{{ $trans->admin->name ?? 'النظام' }}</td>
+                                <td>{{ $trans->admin->name ?? __('admin.system') }}</td>
                                 <td>{{ $trans->notes ?? '-' }}</td>
                             </tr>
                         @endforeach
@@ -87,7 +87,7 @@
         @else
             <div class="empty-state">
                 <div class="empty-icon">📭</div>
-                <p>لا توجد عمليات بعد</p>
+                <p>{{ __('admin.no_transactions') }}</p>
             </div>
         @endif
     </div>
@@ -96,23 +96,23 @@
     <div id="addModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>➕ إضافة رصيد</h3>
+                <h3>➕ {{ __('admin.add_balance') }}</h3>
                 <span class="close" onclick="closeAddModal()">&times;</span>
             </div>
             <form action="{{ route('admin.wallets.add', $user->id) }}" method="POST">
                 @csrf
                 <div class="form-group">
-                    <label>المبلغ *</label>
+                    <label>{{ __('admin.amount_required') }}</label>
                     <input type="number" name="amount" step="0.01" min="0.01" required
-                           placeholder="مثال: 100.00">
+                           placeholder="{{ __('admin.deposit_reason') }}">
                 </div>
                 <div class="form-group">
-                    <label>ملاحظات (اختياري)</label>
-                    <textarea name="notes" rows="3" placeholder="سبب الإضافة..."></textarea>
+                    <label>{{ __('admin.notes_optional') }}</label>
+                    <textarea name="notes" rows="3" placeholder="{{ __('admin.deposit_reason') }}"></textarea>
                 </div>
                 <div class="modal-actions">
-                    <button type="submit" class="btn-submit">💾 إضافة</button>
-                    <button type="button" class="btn-cancel" onclick="closeAddModal()">❌ إلغاء</button>
+                    <button type="submit" class="btn-submit">💾 {{ __('admin.add') }}</button>
+                    <button type="button" class="btn-cancel" onclick="closeAddModal()">❌ {{ __('admin.cancel') }}</button>
                 </div>
             </form>
         </div>
@@ -122,25 +122,25 @@
     <div id="withdrawModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>➖ سحب رصيد</h3>
+                <h3>➖ {{ __('admin.withdraw_balance') }}</h3>
                 <span class="close" onclick="closeWithdrawModal()">&times;</span>
             </div>
             <form action="{{ route('admin.wallets.withdraw', $user->id) }}" method="POST">
                 @csrf
                 <div class="form-group">
-                    <label>المبلغ *</label>
+                    <label>{{ __('admin.amount_required') }}</label>
                     <input type="number" name="amount" step="0.01" min="0.01"
                            max="{{ $wallet->balance ?? 0 }}" required
-                           placeholder="مثال: 50.00">
-                    <small>الحد الأقصى: {{ number_format($wallet->balance ?? 0, 2) }} ₪</small>
+                           placeholder="{{ __('admin.withdraw_reason') }}">
+                    <small>{{ __('admin.maximum') }}: {{ number_format($wallet->balance ?? 0, 2) }} ₪</small>
                 </div>
                 <div class="form-group">
-                    <label>ملاحظات (اختياري)</label>
-                    <textarea name="notes" rows="3" placeholder="سبب السحب..."></textarea>
+                    <label>{{ __('admin.notes_optional') }}</label>
+                    <textarea name="notes" rows="3" placeholder="{{ __('admin.withdraw_reason') }}"></textarea>
                 </div>
                 <div class="modal-actions">
-                    <button type="submit" class="btn-submit">💾 سحب</button>
-                    <button type="button" class="btn-cancel" onclick="closeWithdrawModal()">❌ إلغاء</button>
+                    <button type="submit" class="btn-submit">💾 {{ __('admin.withdraw') }}</button>
+                    <button type="button" class="btn-cancel" onclick="closeWithdrawModal()">❌ {{ __('admin.cancel') }}</button>
                 </div>
             </form>
         </div>
@@ -148,5 +148,6 @@
 @endsection
 
 @push('scripts')
+<script src="{{ asset('js/translations.js') }}"></script>
 <script src="{{ asset('js/wallets-scripts.js') }}"></script>
 @endpush

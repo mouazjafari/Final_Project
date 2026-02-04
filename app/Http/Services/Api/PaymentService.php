@@ -6,6 +6,7 @@ use App\Exceptions\GeneralException;
 use App\Http\Enum\OrderStatusEnum;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Notifications\OrderStatusUpdatedNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -175,7 +176,11 @@ class PaymentService
 
                     $order = $payment->order;
                     if ($order) {
+                        $oldStatus = $order->status;
                         $order->update(['status' => 'processing']);
+
+                        // إرسال إشعار عن تغيير حالة الطلب
+                        $order->user->notify(new OrderStatusUpdatedNotification($order, $oldStatus));
 
                         foreach ($order->designOrders as $designOrder) {
                             $design = $designOrder->design;
@@ -257,7 +262,11 @@ class PaymentService
                     'paid_at' => now(),
                 ]);
 
+                $oldStatus = $order->status;
                 $order->update(['status' => OrderStatusEnum::Processing]);
+
+                // إرسال إشعار عن تغيير حالة الطلب
+                $order->user->notify(new OrderStatusUpdatedNotification($order, $oldStatus));
 
                 foreach ($order->designOrders as $designOrder) {
                     $design = $designOrder->design;

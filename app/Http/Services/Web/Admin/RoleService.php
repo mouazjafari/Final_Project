@@ -15,21 +15,30 @@ class RoleService
     public function createRole(array $data)
     {
         return DB::transaction(function () use ($data) {
+            // دائماً إنشاء الـ role بـ guard = web
             $role = Role::create([
                 'name' => $data['name'],
-                'guard_name' => $data['guard_name'],
+                'guard_name' => 'web', // دائماً web
             ]);
 
             if (!empty($data['permissions'])) {
-                // ✅ فلتر الـ Permissions - خلي بس اللي عندهم نفس الـ guard
+                // فلتر الـ Permissions - خلي بس اللي عندهم web guard
                 $validPermissions = \Spatie\Permission\Models\Permission::whereIn('id', $data['permissions'])
-                    ->where('guard_name', $data['guard_name']) // ✅ نفس الـ guard
+                    ->where('guard_name', 'web') // دائماً web
                     ->pluck('id')
                     ->toArray();
 
                 if (!empty($validPermissions)) {
                     $role->syncPermissions($validPermissions);
                 }
+            }
+
+            // إضافة access dashboard تلقائياً لكل الأدوار
+            $dashboardPermission = \Spatie\Permission\Models\Permission::where('name', 'access dashboard')
+                ->where('guard_name', 'web')
+                ->first();
+            if ($dashboardPermission && !$role->hasPermissionTo($dashboardPermission)) {
+                $role->givePermissionTo($dashboardPermission);
             }
 
             return $role;
@@ -51,6 +60,14 @@ class RoleService
                     ->toArray();
 
                 $role->syncPermissions($validPermissions);
+
+                // إضافة access dashboard تلقائياً لكل الأدوار
+                $dashboardPermission = \Spatie\Permission\Models\Permission::where('name', 'access dashboard')
+                    ->where('guard_name', 'web')
+                    ->first();
+                if ($dashboardPermission && !$role->hasPermissionTo($dashboardPermission)) {
+                    $role->givePermissionTo($dashboardPermission);
+                }
             }
 
             return $role;

@@ -18,7 +18,8 @@
             rows.forEach(r => {
                 const lbl = (r.querySelector('.address-label') && r.querySelector(
                     '.address-label').textContent.trim());
-                if (lbl && lbl.startsWith('المدينة')) {
+                const cityLabel = getCurrentLanguage() === 'ar' ? 'المدينة' : 'City';
+                if (lbl && lbl.startsWith(cityLabel)) {
                     city = (r.querySelector('.address-value') && r.querySelector(
                         '.address-value').textContent.trim()) || '';
                 }
@@ -41,9 +42,9 @@
 // Delete confirmation
 document.querySelectorAll('.btn-delete').forEach(btn => {
     btn.addEventListener('click', function() {
-        if (confirm('هل أنت متأكد من حذف هذا العنوان؟')) {
+        if (confirm(__('deleteAddressConfirm'))) {
             // Add delete logic here
-            alert('تم حذف العنوان بنجاح');
+            alert(__('deleteAddressSuccess'));
         }
     });
 });
@@ -79,10 +80,15 @@ function openModalFromCard(card) {
         if (!labelEl || !valueEl) return;
         const labelText = labelEl.textContent.trim();
         const valText = valueEl.textContent.trim();
-        if (labelText.startsWith('المدينة')) city = valText || '-';
-        else if (labelText.startsWith('الحي')) area = valText || '-';
-        else if (labelText.startsWith('الشارع')) street = valText || '-';
-        else if (labelText.startsWith('ملاحظات')) notes = valText || '-';
+        const cityLabel = getCurrentLanguage() === 'ar' ? 'المدينة' : 'City';
+        const areaLabel = getCurrentLanguage() === 'ar' ? 'الحي' : 'Area';
+        const streetLabel = getCurrentLanguage() === 'ar' ? 'الشارع' : 'Street';
+        const notesLabel = getCurrentLanguage() === 'ar' ? 'ملاحظات' : 'Notes';
+
+        if (labelText.startsWith(cityLabel)) city = valText || '-';
+        else if (labelText.startsWith(areaLabel)) area = valText || '-';
+        else if (labelText.startsWith(streetLabel)) street = valText || '-';
+        else if (labelText.startsWith(notesLabel)) notes = valText || '-';
     });
 
     modalCity.textContent = city;

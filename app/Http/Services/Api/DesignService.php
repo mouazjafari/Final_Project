@@ -3,6 +3,8 @@
 namespace App\Http\Services\Api;
 
 use App\Models\Design;
+use App\Models\User;
+use App\Notifications\DesignCreatedNotification;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -104,6 +106,12 @@ class DesignService
                             ]);
                         }
                     }
+                }
+
+                // إرسال إشعار للأدمن (Admins) عند إنشاء تصميم جديد
+                $admins = User::role('admin', 'web')->get();
+                foreach ($admins as $admin) {
+                    $admin->notify(new DesignCreatedNotification($design));
                 }
 
                 return $design;

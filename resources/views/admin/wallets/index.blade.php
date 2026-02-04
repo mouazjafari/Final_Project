@@ -1,5 +1,5 @@
 @extends('admin.layouts.admin-layout')
-@section('title', 'إدارة المحافظ - لوحة التحكم')
+@section('title', __('admin.wallets_title'))
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/wallets-styles.css') }}">
@@ -16,13 +16,13 @@
 
     <!-- Page Header -->
     <div class="page-header">
-        <h2>💰 إدارة المحافظ</h2>
+        <h2>{{ __('admin.wallets_management') }}</h2>
         <div class="page-stats">
             <span class="stat-badge">
-                المحافظ: {{ $wallets->count() }}
+                {{ __('admin.wallets_count') }}: {{ $wallets->count() }}
             </span>
             <span class="stat-badge">
-                الأرصدة: {{ number_format($wallets->sum('balance'), 2) }} ₪
+                {{ __('admin.balances') }}: {{ number_format($wallets->sum('balance'), 2) }} ₪
             </span>
         </div>
     </div>
@@ -31,14 +31,14 @@
     <div class="filter-section">
         <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="ابحث عن اسم المستخدم...">
+            <input type="text" id="searchInput" placeholder="{{ __('admin.search_user_name_wallet') }}">
         </div>
 
         <select class="filter-select" id="balanceFilter">
-            <option value="">كل الأرصدة</option>
-            <option value="zero">رصيد صفر</option>
-            <option value="positive">رصيد موجب</option>
-            <option value="high">رصيد عالي (500+)</option>
+            <option value="">{{ __('admin.all_balances') }}</option>
+            <option value="zero">{{ __('admin.zero_balance') }}</option>
+            <option value="positive">{{ __('admin.positive_balance') }}</option>
+            <option value="high">{{ __('admin.high_balance') }}</option>
         </select>
     </div>
 
@@ -66,13 +66,13 @@
                 </div>
 
                 <div class="wallet-balance">
-                    <div class="balance-label">الرصيد الحالي</div>
+                    <div class="balance-label">{{ __('admin.current_balance') }}</div>
                     <div class="balance-amount">{{ number_format($wallet->balance, 2) }} ₪</div>
                 </div>
 
                 @if ($wallet->transactions->count() > 0)
                     <div class="recent-transactions">
-                        <div class="transactions-label">آخر العمليات:</div>
+                        <div class="transactions-label">{{ __('admin.recent_transactions') }}:</div>
                         @foreach ($wallet->transactions->take(3) as $trans)
                             <div class="mini-transaction {{ $trans->type }}">
                                 <span class="trans-icon">
@@ -92,7 +92,7 @@
 
                 <div class="card-actions">
                     <a href="{{ route('admin.wallets.show', $wallet->user_id) }}" class="btn-view">
-                        👁️ عرض التفاصيل
+                        👁️ {{ __('admin.view_details') }}
                     </a>
                 </div>
             </div>
@@ -101,13 +101,14 @@
 
     @if ($wallets->isEmpty())
         <div class="empty-state">
-            <div class="empty-icon">💸</div>
-            <h3>لا توجد محافظ حالياً</h3>
-            <p>لم يتم إنشاء أي محفظة بعد</p>
+            <div class="empty-icon">💰</div>
+            <h3>{{ __('admin.no_wallets') }}</h3>
+            <p>{{ __('admin.no_wallets_created') }}</p>
         </div>
     @endif
 @endsection
 
 @push('scripts')
+<script src="{{ asset('js/translations.js') }}"></script>
 <script src="{{ asset('js/wallets-scripts.js') }}"></script>
 @endpush

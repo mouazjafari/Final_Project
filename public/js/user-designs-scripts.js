@@ -73,7 +73,7 @@ function filterCards() {
 function updateResultsCount(count) {
     const statBadge = document.querySelector('.stat-badge');
     if (statBadge) {
-        statBadge.textContent = `النتائج: ${count}`;
+        statBadge.textContent = `${__('results')}: ${count}`;
     }
 }
 
@@ -443,4 +443,4 @@ window.addEventListener('load', function() {
             }, 50);
         }, index * 50);
     });
-}); 
+});

@@ -111,8 +111,8 @@
 
 .search-box input:focus {
     outline: none;
-    border-color: #2c3e50;
-    box-shadow: 0 0 0 3px rgba(44,62,80,0.1);
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
 .filter-select {
@@ -126,7 +126,7 @@
 
 .filter-select:focus {
     outline: none;
-    border-color: #2c3e50;
+    border-color: #3498db;
 }
 
 /* ==================== Roles Grid ==================== */
@@ -650,6 +650,96 @@
     display: flex;
     gap: 1rem;
     padding: 0 2rem 2rem;
+}
+
+/* ==================== Permission Category Style ==================== */
+.permission-category {
+    background: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s;
+}
+
+.permission-category:hover {
+    background: #ffffff;
+    border-color: #3498db;
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.1);
+}
+
+.permission-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background: #ffffff;
+    border: 2px solid #d1fae5;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+    font-weight: 500;
+    position: relative;
+}
+
+.permission-badge input[type="checkbox"] {
+    display: none;
+}
+
+.permission-badge .badge-text {
+    color: #059669;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.permission-badge .badge-text::before {
+    content: '✓';
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #10b981;
+    color: white;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.permission-badge:hover {
+    background: #ecfdf5;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15);
+}
+
+.permission-badge:has(input[type="checkbox"]:checked) {
+    background: #d1fae5;
+    border-color: #10b981;
+}
+
+.permission-badge:has(input[type="checkbox"]:not(:checked)) .badge-text::before {
+    background: #e5e7eb;
+    color: #9ca3af;
+}
+
+.permission-badge:has(input[type="checkbox"]:not(:checked)) .badge-text {
+    color: #6b7280;
+}
+
+.permissions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .permissions-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ==================== Empty State ==================== */

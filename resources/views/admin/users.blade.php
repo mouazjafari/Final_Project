@@ -1,17 +1,36 @@
 @extends('admin.layouts.admin-layout')
 
-@section('title', 'إدارة المستخدمين - لوحة التحكم')
+@section('title', __('admin.users_title'))
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/users-styles.css') }}">
 @endpush
 
 @section('content')
+    @if (session('success'))
+        <div class="alert alert-success" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
+            ✓ {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-error" style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
+            ✗ {{ session('error') }}
+        </div>
+    @endif
+
     <!-- Page Header -->
     <div class="page-header" style="background: linear-gradient(90deg,#2c3e50,#34495e);">
-        <h2>👥 إدارة المستخدمين</h2>
-        <div class="page-stats">
-            <span class="stat-badge">إجمالي: {{ $users->count() ?? 0 }}</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <h2>{{ __('admin.users_management') }}</h2>
+            <div class="page-stats" style="display: flex; align-items: center; gap: 15px;">
+                <span class="stat-badge">{{ __('admin.total_users') }}: {{ $users->count() ?? 0 }}</span>
+                @if(auth()->user()->hasPermissionTo('create users', 'web'))
+                    <a href="{{ route('admin.users.create') }}" class="btn-add-new" style="background: #27ae60; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; white-space: nowrap;">
+                        ➕ إضافة مستخدم جديد
+                    </a>
+                @endif
+            </div>
         </div>
     </div>
 
@@ -19,20 +38,20 @@
     <div class="filter-section">
         <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="ابحث عن اسم، إيميل أو هاتف...">
+            <input type="text" id="searchInput" placeholder="{{ __('admin.search_name_email_phone') }}">
         </div>
 
         <select class="filter-select" id="roleFilter">
-            <option value="">كل الصلاحيات</option>
+            <option value="">{{ __('admin.all_permissions') }}</option>
             <option value="user">user</option>
             <option value="admin">admin</option>
             <option value="superadmin">superadmin</option>
         </select>
 
         <select class="filter-select" id="statusFilter">
-            <option value="">حالة الحساب</option>
-            <option value="active">مفعل</option>
-            <option value="inactive">غير مفعل</option>
+            <option value="">{{ __('admin.account_status') }}</option>
+            <option value="active">{{ __('admin.active') }}</option>
+            <option value="inactive">{{ __('admin.inactive') }}</option>
         </select>
     </div>
 
@@ -62,14 +81,38 @@
 
                 <div class="address-details user-details">
                     <div class="address-row">
-                        <span class="address-label">الهاتف:</span>
+                        <span class="address-label">{{ __('admin.phone') }}:</span>
                         <span class="address-value">{{ $u->phone_number ?? '-' }}</span>
                     </div>
 
                     <div class="address-row">
-                        <span class="address-label">أنشئ في:</span>
+                        <span class="address-label">الدور:</span>
+                        <span class="address-value">
+                            @if($u->roles->isNotEmpty())
+                                <span style="background: #3498db; color: white; padding: 4px 10px; border-radius: 4px; font-size: 13px;">
+                                    {{ $u->roles->first()->name }}
+                                </span>
+                            @else
+                                <span style="color: #999;">بدون دور</span>
+                            @endif
+                        </span>
+                    </div>
+
+                    <div class="address-row">
+                        <span class="address-label">{{ __('admin.created_on') }}:</span>
                         <span class="address-value">{{ optional($u->created_at)->format('Y-m-d') ?? '-' }}</span>
                     </div>
+                </div>
+
+                <!-- User Actions -->
+                <div class="address-actions" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; justify-content: center;">
+                    @if(auth()->user()->hasPermissionTo('assign roles to users', 'web'))
+                        <a href="{{ route('admin.users.edit', $u->id) }}"
+                           class="btn-action btn-edit"
+                           style="background: #3498db; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 5px;">
+                            ✏️ تعديل الدور
+                        </a>
+                    @endif
                 </div>
             </div>
         @endforeach

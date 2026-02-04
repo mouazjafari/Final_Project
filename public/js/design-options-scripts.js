@@ -32,7 +32,7 @@ function filterCards() {
 
 // Modal Functions
 function openAddModal() {
-    document.getElementById('modalTitle').textContent = '➕ إضافة خيار تصميم جديد';
+    document.getElementById('modalTitle').textContent = '➕ ' + __('addNewDesignOption');
     document.getElementById('optionForm').reset();
     document.getElementById('optionId').value = '';
     document.getElementById('formMethod').value = 'POST';
@@ -41,7 +41,7 @@ function openAddModal() {
 }
 
 function openEditModal(id, nameAr, nameEn, type) {
-    document.getElementById('modalTitle').textContent = '✏️ تعديل خيار التصميم';
+    document.getElementById('modalTitle').textContent = '✏️ ' + __('editDesignOption');
     document.getElementById('optionId').value = id;
     document.getElementById('nameAr').value = nameAr;
     document.getElementById('nameEn').value = nameEn;
@@ -94,7 +94,7 @@ document.getElementById('optionForm')?.addEventListener('submit', function(e) {
 
     if (!nameAr || !nameEn || !type) {
         e.preventDefault();
-        alert('⚠️ الرجاء ملء جميع الحقول المطلوبة');
+        alert('⚠️ ' + __('fillAllFields'));
         return false;
     }
 });

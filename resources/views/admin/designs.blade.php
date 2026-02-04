@@ -1,8 +1,8 @@
 @extends('admin.layouts.admin-layout')
-@section('title', 'إدارة تصاميم المستخدمين - لوحة التحكم')
+@section('title', __('admin.designs_title'))
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/user-designs-styles.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/user-designs-styles.css') }}?v={{ time() }}">
 @endpush
 
 @section('content')
@@ -21,9 +21,9 @@
 
     <!-- Page Header -->
     <div class="page-header" style="background: linear-gradient(90deg,#2c3e50,#34495e);">
-        <h2>🎨 إدارة تصاميم المستخدمين</h2>
+        <h2>{{ __('admin.designs_management') }}</h2>
         <div class="page-stats">
-            <span class="stat-badge">إجمالي التصاميم: {{ $designs->count() ?? 0 }}</span>
+            <span class="stat-badge">{{ __('admin.total_designs') }}: {{ $designs->count() ?? 0 }}</span>
         </div>
     </div>
 
@@ -31,16 +31,16 @@
     <div class="filter-section">
         <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchDesignInput" placeholder="ابحث عن اسم التصميم...">
+            <input type="text" id="searchDesignInput" placeholder="{{ __('admin.search_design_name') }}">
         </div>
 
         <div class="search-box">
             <span class="search-icon">👤</span>
-            <input type="text" id="searchUserInput" placeholder="ابحث عن اسم المستخدم...">
+            <input type="text" id="searchUserInput" placeholder="{{ __('admin.search_user_name') }}">
         </div>
 
         <select class="filter-select" id="sizeFilter">
-            <option value="">كل المقاسات</option>
+            <option value="">{{ __('admin.all_sizes') }}</option>
             <option value="S">S - صغير</option>
             <option value="M">M - وسط</option>
             <option value="L">L - كبير</option>
@@ -49,27 +49,27 @@
         </select>
 
         <select class="filter-select" id="priceFilter">
-            <option value="">كل الأسعار</option>
-            <option value="0-50">أقل من 50</option>
+            <option value="">{{ __('admin.all_prices') }}</option>
+            <option value="0-50">< 50</option>
             <option value="50-100">50 - 100</option>
             <option value="100-200">100 - 200</option>
             <option value="200-500">200 - 500</option>
-            <option value="500+">أكثر من 500</option>
+            <option value="500+"> > 500</option>
         </select>
     </div>
 
     <!-- Advanced Filters (Bonus) -->
     <div class="advanced-filters">
         <button class="toggle-filters-btn" onclick="toggleAdvancedFilters()">
-            <span id="toggleIcon">▼</span> فلاتر متقدمة
+            <span id="toggleIcon">▼</span> {{ __('admin.advanced_filters') }}
         </button>
 
         <div id="advancedFiltersContent" class="advanced-filters-content" style="display: none;">
             <div class="filters-grid">
                 <div class="filter-group">
-                    <label>🎨 اللون:</label>
+                    <label>{{ __('admin.color') }}:</label>
                     <select class="filter-select-small" id="colorFilter">
-                        <option value="">الكل</option>
+                        <option value="">{{ __('admin.all') }}</option>
                         @foreach ($colors ?? [] as $color)
                             <option value="{{ $color->id }}">{{ $color->getTranslation('name', 'ar') }}</option>
                         @endforeach
@@ -77,9 +77,9 @@
                 </div>
 
                 <div class="filter-group">
-                    <label>👔 الكم:</label>
+                    <label>{{ __('admin.sleeve') }}:</label>
                     <select class="filter-select-small" id="sleeveFilter">
-                        <option value="">الكل</option>
+                        <option value="">{{ __('admin.all') }}</option>
                         @foreach ($sleeves ?? [] as $sleeve)
                             <option value="{{ $sleeve->id }}">{{ $sleeve->getTranslation('name', 'ar') }}</option>
                         @endforeach
@@ -87,9 +87,9 @@
                 </div>
 
                 <div class="filter-group">
-                    <label>🏛️ القبة:</label>
+                    <label>{{ __('admin.dome') }}:</label>
                     <select class="filter-select-small" id="domeFilter">
-                        <option value="">الكل</option>
+                        <option value="">{{ __('admin.all') }}</option>
                         @foreach ($domes ?? [] as $dome)
                             <option value="{{ $dome->id }}">{{ $dome->getTranslation('name', 'ar') }}</option>
                         @endforeach
@@ -97,9 +97,9 @@
                 </div>
 
                 <div class="filter-group">
-                    <label>🧵 القماش:</label>
+                    <label>{{ __('admin.fabric') }}:</label>
                     <select class="filter-select-small" id="fabricFilter">
-                        <option value="">الكل</option>
+                        <option value="">{{ __('admin.all') }}</option>
                         @foreach ($fabrics ?? [] as $fabric)
                             <option value="{{ $fabric->id }}">{{ $fabric->getTranslation('name', 'ar') }}</option>
                         @endforeach
@@ -108,7 +108,7 @@
             </div>
 
             <button class="reset-filters-btn" onclick="resetFilters()">
-                🔄 إعادة تعيين الفلاتر
+                {{ __('admin.reset_filters') }}
             </button>
         </div>
     </div>
@@ -169,7 +169,7 @@
 
                 <div class="address-details">
                     <div class="address-row">
-                        <span class="address-label">المقاسات:</span>
+                        <span class="address-label">{{ __('admin.sizes') }}:</span>
                         <span class="address-value">
                             @if ($design->sizes && $design->sizes->count() > 0)
                                 @foreach ($design->sizes as $size)
@@ -187,20 +187,20 @@
                                     </span>
                                 @endforeach
                             @else
-                                <span class="size-badge">لا يوجد</span>
+                                <span class="size-badge">{{ __('admin.not_available') }}</span>
                             @endif
                         </span>
                     </div>
 
                     <div class="address-row">
-                        <span class="address-label">السعر:</span>
+                        <span class="address-label">{{ __('admin.price') }}:</span>
                         <span class="address-value price-value">{{ number_format($design->price, 2) }} ₪</span>
                     </div>
 
                     {{-- عرض الألوان --}}
                     @if ($design->designOptions->where('type', 'color')->count() > 0)
                         <div class="address-row">
-                            <span class="address-label">الألوان:</span>
+                            <span class="address-label">{{ __('admin.colors') }}:</span>
                             <span class="address-value">
                                 @foreach ($design->designOptions->where('type', 'color') as $color)
                                     <span class="option-badge color-badge">
@@ -214,7 +214,7 @@
                     {{-- عرض الأكمام --}}
                     @if ($design->designOptions->where('type', 'sleeve')->count() > 0)
                         <div class="address-row">
-                            <span class="address-label">الأكمام:</span>
+                            <span class="address-label">{{ __('admin.sleeves') }}:</span>
                             <span class="address-value">
                                 @foreach ($design->designOptions->where('type', 'sleeve') as $sleeve)
                                     <span class="option-badge sleeve-badge">
@@ -291,5 +291,6 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('js/translations.js') }}"></script>
     <script src="{{ asset('js/user-designs-scripts.js') }}"></script>
 @endpush
