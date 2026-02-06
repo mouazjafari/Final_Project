@@ -41,8 +41,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             return redirect()
-                ->intended(route('admin.dashboard'))
-                ->with('success', $result['message']);
+                ->intended(route('admin.dashboard'));
         } catch (\Exception $e) {
             return back()
                 ->with('error', $e->getMessage())
@@ -61,5 +60,21 @@ class AuthController extends Controller
     public function showLoginForm()
     {
         return view('login');
+    }
+
+    /**
+     * تحديث FCM Token للإشعارات
+     */
+    public function updateFcmToken(Request $request)
+    {
+        $request->validate([
+            'fcm_token' => 'required|string'
+        ]);
+
+        /** @var User $user */
+        $user = Auth::user();
+        $user->update(['fcm_token' => $request->fcm_token]);
+
+        return response()->json(['success' => true]);
     }
 }

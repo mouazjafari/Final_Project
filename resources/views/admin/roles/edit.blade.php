@@ -1,5 +1,5 @@
 @extends('admin.layouts.admin-layout')
-@section('title', 'تعديل الدور - لوحة التحكم')
+@section('title', app()->getLocale() == 'ar' ? 'تعديل الدور - لوحة التحكم' : 'Edit Role - Dashboard')
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/roles-permissions-styles.css') }}">
@@ -22,9 +22,9 @@
 
     <!-- Page Header -->
     <div class="page-header" style="background: linear-gradient(90deg,#2c3e50,#34495e);">
-        <h2>✏️ تعديل الدور: {{ $role->name }}</h2>
+        <h2>✏️ {{ app()->getLocale() == 'ar' ? 'تعديل الدور: ' . $role->name : 'Edit Role: ' . $role->name }}</h2>
         <a href="{{ route('admin.roles.index') }}" class="btn-back">
-            ← العودة
+            {{ app()->getLocale() == 'ar' ? '← العودة' : '← Back' }}
         </a>
     </div>
 
@@ -35,27 +35,28 @@
             @method('PUT')
 
             <div class="form-grid">
+                @php $isAr = app()->getLocale() == 'ar'; @endphp
                 <!-- اسم الدور -->
                 <div class="form-group">
-                    <label for="name">اسم الدور *</label>
+                    <label for="name">{{ $isAr ? 'اسم الدور *' : 'Role Name *' }}</label>
                     <input type="text" name="name" id="name" value="{{ old('name', $role->name) }}"
-                        placeholder="مثال: manager" required maxlength="100">
-                    <small>استخدم أحرف صغيرة بدون مسافات</small>
+                        placeholder="{{ $isAr ? 'مثال: manager' : 'Example: manager' }}" required maxlength="100">
+                    <small>{{ $isAr ? 'استخدم أحرف صغيرة بدون مسافات' : 'Use lowercase letters without spaces' }}</small>
                 </div>
 
                 <!-- Guard Name (عرض فقط) -->
                 <div class="form-group">
-                    <label>Guard Name</label>
+                    <label>{{ $isAr ? 'نوع الحماية' : 'Guard Name' }}</label>
                     <input type="text" value="{{ strtoupper($role->guard_name) }}" disabled
                         style="background: #f3f4f6; cursor: not-allowed;">
-                    <small>لا يمكن تعديل الـ Guard بعد الإنشاء</small>
+                    <small>{{ $isAr ? 'لا يمكن تعديل الـ Guard بعد الإنشاء' : 'Guard cannot be modified after creation' }}</small>
                 </div>
             </div>
 
             <!-- Permissions Section -->
             <div class="permissions-section">
-                <h3>🔐 الصلاحيات (Permissions)</h3>
-                <small>اختر الصلاحيات التي تريد إعطاءها لهذا الدور</small>
+                <h3>🔐 {{ $isAr ? 'الصلاحيات' : 'Permissions' }}</h3>
+                <small>{{ $isAr ? 'اختر الصلاحيات التي تريد إعطاءها لهذا الدور' : 'Select the permissions you want to grant to this role' }}</small>
 
                 @php
                     $selectedPermissions = old('permissions', $role->permissions->pluck('id')->toArray());
@@ -131,7 +132,7 @@
                         @endforeach
                     @else
                         <p style="text-align: center; color: #ef4444;">
-                            لا توجد صلاحيات متاحة لـ {{ strtoupper($role->guard_name) }}
+                            {{ $isAr ? 'لا توجد صلاحيات متاحة لـ ' . strtoupper($role->guard_name) : 'No permissions available for ' . strtoupper($role->guard_name) }}
                         </p>
                     @endif
                 </div>
@@ -140,10 +141,10 @@
             <!-- Form Actions -->
             <div class="form-actions">
                 <button type="submit" class="btn-submit">
-                    💾 حفظ التعديلات
+                    💾 {{ $isAr ? 'حفظ التعديلات' : 'Save Changes' }}
                 </button>
                 <a href="{{ route('admin.roles.index') }}" class="btn-cancel">
-                    ❌ إلغاء
+                    ❌ {{ $isAr ? 'إلغاء' : 'Cancel' }}
                 </a>
             </div>
         </form>
@@ -152,29 +153,29 @@
     <!-- Additional Info Card -->
     <div class="form-card"
         style="margin-top: 2rem; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #3b82f6;">
-        <h3 style="color: #1e40af; margin-bottom: 1rem; font-size: 1.2rem;">📊 معلومات إضافية</h3>
+        <h3 style="color: #1e40af; margin-bottom: 1rem; font-size: 1.2rem;">📊 {{ $isAr ? 'معلومات إضافية' : 'Additional Information' }}</h3>
 
         <div class="form-grid">
             <div class="form-group">
-                <label>عدد المستخدمين</label>
+                <label>{{ $isAr ? 'عدد المستخدمين' : 'Number of Users' }}</label>
                 <input type="text" value="{{ $role->users()->count() }}" disabled
                     style="background: #f3f4f6; cursor: not-allowed;">
             </div>
 
             <div class="form-group">
-                <label>عدد الصلاحيات الحالية</label>
+                <label>{{ $isAr ? 'عدد الصلاحيات الحالية' : 'Current Permissions Count' }}</label>
                 <input type="text" value="{{ $role->permissions()->count() }}" disabled
                     style="background: #f3f4f6; cursor: not-allowed;">
             </div>
 
             <div class="form-group">
-                <label>تاريخ الإنشاء</label>
+                <label>{{ $isAr ? 'تاريخ الإنشاء' : 'Created At' }}</label>
                 <input type="text" value="{{ $role->created_at->format('Y-m-d H:i') }}" disabled
                     style="background: #f3f4f6; cursor: not-allowed;">
             </div>
 
             <div class="form-group">
-                <label>آخر تحديث</label>
+                <label>{{ $isAr ? 'آخر تحديث' : 'Last Updated' }}</label>
                 <input type="text" value="{{ $role->updated_at->format('Y-m-d H:i') }}" disabled
                     style="background: #f3f4f6; cursor: not-allowed;">
             </div>

@@ -134,7 +134,7 @@
 
                         <div class="address-row">
                             <span class="address-label">{{ __('admin.total') }}:</span>
-                            <span class="address-value price-value">{{ number_format($order->total_price, 2) }} ₪</span>
+                            <span class="address-value price-value">${{ number_format($order->total_price, 2) }}</span>
                         </div>
 
                         {{-- @if ($order->design)

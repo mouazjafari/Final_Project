@@ -154,7 +154,7 @@
                     @if ($coupon->type === 'percentage')
                         {{ $coupon->amount }}%
                     @else
-                        {{ number_format($coupon->amount, 2) }} ₪
+                        ${{ number_format($coupon->amount, 2) }}
                     @endif
                 </div>
             </div>
@@ -169,7 +169,7 @@
             <div class="summary-item">
                 <div class="summary-label">💵 إجمالي الخصومات</div>
                 <div class="summary-value highlight">
-                    {{ number_format($coupon->usages->sum('discount_amount'), 2) }} ₪
+                    ${{ number_format($coupon->usages->sum('discount_amount'), 2) }}
                 </div>
             </div>
 
@@ -235,7 +235,7 @@
                             </td>
                             <td>
                                 <span class="discount-badge">
-                                    {{ number_format($usage->discount_amount, 2) }} ₪
+                                    ${{ number_format($usage->discount_amount, 2) }}
                                 </span>
                             </td>
                             <td>
@@ -267,7 +267,7 @@
                         💵 إجمالي الخصومات الممنوحة:
                     </span>
                     <span style="color: #10b981; font-weight: 700; font-size: 1.3rem; margin-right: 0.5rem;">
-                        {{ number_format($coupon->usages->sum('discount_amount'), 2) }} ₪
+                        ${{ number_format($coupon->usages->sum('discount_amount'), 2) }}
                     </span>
                 </div>
             </div>

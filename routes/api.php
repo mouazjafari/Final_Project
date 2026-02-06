@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\WebhookController;
+use App\Http\Controllers\FcmTokenController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ Route::post('/stripe/webhook', [WebhookController::class, 'handleStripeWebhook']
 Route::prefix('user')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
-    Route::middleware('auth:api')->group(function () {
+    Route::middleware(['auth:api', 'active.user'])->group(function () {
         Route::get('/', [UserController::class, 'show']);
         Route::put('/update', [UserController::class, 'update']);
         Route::delete('/destroy', [UserController::class, 'destroy']);
@@ -76,6 +77,10 @@ Route::prefix('user')->group(function () {
             Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
             Route::delete('/{id}', [NotificationController::class, 'destroy']);
             Route::delete('/', [NotificationController::class, 'destroyAll']);
+        });
+        Route::prefix('fcm')->group(function () {
+            Route::post('/token', [FcmTokenController::class, 'store']);
+            Route::delete('/token', [FcmTokenController::class, 'destroy']);
         });
     });
 });

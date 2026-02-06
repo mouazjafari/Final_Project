@@ -29,7 +29,7 @@
         </div>
         <div class="balance-card-body">
             <div class="main-balance">
-                {{ number_format($wallet->balance ?? 0, 2) }} ₪
+                ${{ number_format($wallet->balance ?? 0, 2) }}
             </div>
             <div class="balance-actions">
                 <button class="btn-add" onclick="openAddModal()">
@@ -73,10 +73,10 @@
                                 </td>
                                 <td class="amount-cell {{ $trans->type }}">
                                     {{ $trans->type == 'deposit' ? '+' : '-' }}
-                                    {{ number_format($trans->amount, 2) }} ₪
+                                    ${{ number_format($trans->amount, 2) }}
                                 </td>
-                                <td>{{ number_format($trans->balance_before, 2) }} ₪</td>
-                                <td>{{ number_format($trans->balance_after, 2) }} ₪</td>
+                                <td>${{ number_format($trans->balance_before, 2) }}</td>
+                                <td>${{ number_format($trans->balance_after, 2) }}</td>
                                 <td>{{ $trans->admin->name ?? __('admin.system') }}</td>
                                 <td>{{ $trans->notes ?? '-' }}</td>
                             </tr>
@@ -132,7 +132,7 @@
                     <input type="number" name="amount" step="0.01" min="0.01"
                            max="{{ $wallet->balance ?? 0 }}" required
                            placeholder="{{ __('admin.withdraw_reason') }}">
-                    <small>{{ __('admin.maximum') }}: {{ number_format($wallet->balance ?? 0, 2) }} ₪</small>
+                    <small>{{ __('admin.maximum') }}: ${{ number_format($wallet->balance ?? 0, 2) }}</small>
                 </div>
                 <div class="form-group">
                     <label>{{ __('admin.notes_optional') }}</label>

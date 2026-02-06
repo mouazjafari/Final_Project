@@ -11,7 +11,7 @@
 
     <div class="welcome-card">
         <h2>{{ __('admin.welcome_message') }}</h2>
-        <p>{{ __('admin.login_success') }}</p>
+        <p>{{ __('admin.dashboard_description', ['name' => Auth::user()->name]) }}</p>
     </div>
 
     <div class="stats-grid">

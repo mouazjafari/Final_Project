@@ -194,7 +194,7 @@
 
                     <div class="address-row">
                         <span class="address-label">{{ __('admin.price') }}:</span>
-                        <span class="address-value price-value">{{ number_format($design->price, 2) }} ₪</span>
+                        <span class="address-value price-value">${{ number_format($design->price, 2) }}</span>
                     </div>
 
                     {{-- عرض الألوان --}}

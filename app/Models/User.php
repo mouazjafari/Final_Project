@@ -24,6 +24,7 @@ class User extends Authenticatable
         'phone_number',
         'profile_image',
         'password',
+        'fcm_token',
     ];
     protected string $guard_name = 'api';
 

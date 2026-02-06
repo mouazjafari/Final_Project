@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Coupon;
+use App\Notifications\Channels\FcmChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -18,7 +19,7 @@ class CouponCreatedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        return ['database', 'mail', FcmChannel::class];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -42,6 +43,23 @@ class CouponCreatedNotification extends Notification implements ShouldQueue
             'discount_type' => $this->coupon->discount_type,
             'expiry_date' => $this->coupon->expiry_date,
             'message' => 'New coupon "' . $this->coupon->code . '" is now available!',
+        ];
+    }
+
+    public function toFcm(object $notifiable): array
+    {
+        return [
+            'notification' => [
+                'title' => 'New Coupon Available!',
+                'body' => 'Use code: ' . $this->coupon->code . ' - ' . $this->coupon->discount_value . ($this->coupon->discount_type === 'percentage' ? '%' : ' USD') . ' off',
+                'sound' => 'default',
+            ],
+            'data' => [
+                'type' => 'coupon_created',
+                'coupon_id' => (string) $this->coupon->id,
+                'code' => $this->coupon->code,
+                'action' => 'go_to_coupons',
+            ],
         ];
     }
 }

@@ -148,6 +148,9 @@ class OrderService
                     // إرسال إشعار لصاحب التصميم
                     $design->user->notify(new OrderCreatedNotification($order));
 
+                    // إرسال إشعار للمشتري (صاحب الطلب)
+                    $order->user->notify(new OrderCreatedNotification($order));
+
                     // إرسال إشعار للمستخدمين اللي عندهم صلاحية عرض الطلبات في الـ web
                     $permission = \Spatie\Permission\Models\Permission::where('name', 'view orders')
                         ->where('guard_name', 'web')

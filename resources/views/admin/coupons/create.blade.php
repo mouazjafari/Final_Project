@@ -161,7 +161,7 @@
                 label.textContent = lang === 'ar' ? 'نسبة الخصم (%) *' : 'Discount Percentage (%) *';
                 hint.textContent = lang === 'ar' ? 'مثال: 20 يعني 20%' : 'Example: 20 means 20%';
             } else if (type === 'fixed') {
-                label.textContent = lang === 'ar' ? 'مبلغ الخصم (₪) *' : 'Discount Amount (₪) *';
+                label.textContent = lang === 'ar' ? 'مبلغ الخصم ($) *' : 'Discount Amount ($) *';
                 hint.textContent = lang === 'ar' ? 'مثال: 50 يعني 50 ليرة' : 'Example: 50 means 50 Shekels';
             } else {
                 label.textContent = lang === 'ar' ? 'قيمة الخصم *' : 'Discount Value *';

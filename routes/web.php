@@ -72,6 +72,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/', [UserController::class, 'store'])->name('store');
             Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
             Route::put('/{id}/role', [UserController::class, 'updateRole'])->name('updateRole');
+            Route::patch('/{id}/toggle-status', [UserController::class, 'toggleStatus'])->name('toggleStatus');
         });
 
         // Backward compatibility route
@@ -111,6 +112,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Logout
         Route::post('/logout', [AuthController::class, 'logout'])
             ->name('logout');
+
+        // FCM Token Update
+        Route::post('/update-fcm-token', [AuthController::class, 'updateFcmToken'])
+            ->name('update-fcm-token');
 
         // Wallets Management
         Route::prefix('wallets')->name('wallets.')->group(function () {

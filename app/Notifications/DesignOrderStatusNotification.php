@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\DesignOrder;
+use App\Notifications\Channels\FcmChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -18,7 +19,7 @@ class DesignOrderStatusNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        return ['database', 'mail', FcmChannel::class];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -37,6 +38,23 @@ class DesignOrderStatusNotification extends Notification implements ShouldQueue
             'design_order_id' => $this->designOrder->id,
             'status' => $this->designOrder->status,
             'message' => 'Your design order #' . $this->designOrder->id . ' status is now ' . $this->designOrder->status . '.',
+        ];
+    }
+
+    public function toFcm(object $notifiable): array
+    {
+        return [
+            'notification' => [
+                'title' => 'Design Order Status Updated',
+                'body' => 'Design order #' . $this->designOrder->id . ' is now ' . $this->designOrder->status,
+                'sound' => 'default',
+            ],
+            'data' => [
+                'type' => 'design_order_status',
+                'design_order_id' => (string) $this->designOrder->id,
+                'status' => $this->designOrder->status,
+                'action' => 'go_to_design_order_details',
+            ],
         ];
     }
 }

@@ -91,8 +91,9 @@ class UserController extends Controller
         ]);
 
         // إعطاء الدور للمستخدم الجديد
-        $newUser->assignRole($selectedRole->name);
-
+        $newUser->roles()->attach($selectedRole->id, [
+            'model_type' => 'App\Models\User'
+        ]);
         return redirect()->route('admin.users')
             ->with('success', 'تم إنشاء المستخدم بنجاح!');
     }
@@ -105,7 +106,7 @@ class UserController extends Controller
         $currentUser = Auth::user();
         $user = User::with('roles')->findOrFail($id);
 
-        // التحقق من c
+        // التحقق من البيرمشنز
         if (!$currentUser->hasPermissionTo('create users', 'web')) {
             return redirect()->route('admin.users')
                 ->with('error', 'ليس لديك صلاحية لتعديل أدوار المستخدمين!');
@@ -128,7 +129,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         // التحقق من الصلاحية
-        if (!$currentUser->hasPermissionTo('edit users', 'web')) {
+        if (!$currentUser->hasPermissionTo('create users', 'web')) {
             return redirect()->route('admin.users')
                 ->with('error', 'ليس لديك صلاحية لتعديل أدوار المستخدمين!');
         }
@@ -148,10 +149,52 @@ class UserController extends Controller
                 ->with('error', 'لا يمكنك إعطاء دور SuperAdmin!');
         }
 
-        // تحديث الدور
-        $user->syncRoles([$selectedRole->name]);
+        // حذف كل الأدوار من كل الـ guards
+        \DB::table('model_has_roles')->where('model_id', $user->id)
+            ->where('model_type', 'App\Models\User')->delete();
+
+        // إعطاء الدور الجديد لـ web guard مباشرة
+        $user->roles()->attach($selectedRole->id, [
+            'model_type' => 'App\Models\User'
+        ]);
 
         return redirect()->route('admin.users')
             ->with('success', 'تم تحديث دور المستخدم بنجاح!');
+    }
+
+    /**
+     * تفعيل/تعطيل المستخدم
+     */
+    public function toggleStatus($id)
+    {
+        $currentUser = Auth::user();
+
+        // التحقق من الصلاحيات
+        if (!$currentUser->hasPermissionTo('create users', 'web')) {
+            return redirect()->route('admin.users')
+                ->with('error', 'ليس لديك صلاحية لتعديل المستخدمين!');
+        }
+
+        $user = User::findOrFail($id);
+
+        // التحقق من أن المستخدم لديه دور user فقط
+        if ($user->roles->isEmpty() || $user->roles->first()->name !== RoleUserEnum::User->value) {
+            return redirect()->route('admin.users')
+                ->with('error', 'يمكن تغيير حالة المستخدمين الذين لديهم دور user فقط!');
+        }
+
+        // منع تعطيل الحساب الشخصي
+        if ($user->id === $currentUser->id) {
+            return redirect()->route('admin.users')
+                ->with('error', 'لا يمكنك تعطيل حسابك الشخصي!');
+        }
+
+        // تبديل الحالة
+        $user->is_active = !$user->is_active;
+        $user->save();
+
+        $status = $user->is_active ? 'تم تفعيل' : 'تم تعطيل';
+        return redirect()->route('admin.users')
+            ->with('success', $status . ' المستخدم بنجاح!');
     }
 }

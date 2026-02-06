@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Web Push Test</title>
+</head>
+<body>
+    <h1>Firebase Web Push Notifications Test</h1>
+
+    <div style="margin: 20px;">
+        <h2>Status</h2>
+        <p id="status">Not initialized</p>
+
+        <h2>Actions</h2>
+        <button id="requestPermission" style="padding: 10px 20px; margin: 5px;">Request Permission</button>
+        <button id="getToken" style="padding: 10px 20px; margin: 5px;">Get FCM Token</button>
+        <button id="subscribe" style="padding: 10px 20px; margin: 5px;">Subscribe</button>
+        <button id="unsubscribe" style="padding: 10px 20px; margin: 5px;">Unsubscribe</button>
+
+        <h2>Token</h2>
+        <textarea id="tokenDisplay" style="width: 100%; height: 100px;" readonly></textarea>
+
+        <h2>Auth Token (Paste your Bearer token here)</h2>
+        <input type="text" id="authToken" style="width: 100%; padding: 10px;" placeholder="Paste your auth token here">
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+
+    <!-- Firebase Config -->
+    <script src="/js/firebase-config.js"></script>
+
+    <!-- Firebase Messaging Helper -->
+    <script src="/js/firebase-messaging.js"></script>
+
+    <script>
+        const statusEl = document.getElementById('status');
+        const tokenDisplayEl = document.getElementById('tokenDisplay');
+        const authTokenInput = document.getElementById('authToken');
+
+        // Initialize Firebase Messaging
+        const messaging = new FirebaseWebMessaging(firebaseConfig, window.location.origin);
+
+        // Update status
+        function updateStatus(message, isError = false) {
+            statusEl.textContent = message;
+            statusEl.style.color = isError ? 'red' : 'green';
+            console.log(message);
+        }
+
+        // Request Permission
+        document.getElementById('requestPermission').addEventListener('click', async () => {
+            try {
+                const granted = await messaging.requestPermission();
+                if (granted) {
+                    updateStatus('✅ Permission granted');
+                } else {
+                    updateStatus('❌ Permission denied', true);
+                }
+            } catch (error) {
+                updateStatus('❌ Error: ' + error.message, true);
+            }
+        });
+
+        // Get Token
+        document.getElementById('getToken').addEventListener('click', async () => {
+            try {
+                updateStatus('Getting token...');
+                const token = await messaging.getToken();
+                if (token) {
+                    tokenDisplayEl.value = token;
+                    updateStatus('✅ Token retrieved successfully');
+                } else {
+                    updateStatus('❌ Failed to get token', true);
+                }
+            } catch (error) {
+                updateStatus('❌ Error: ' + error.message, true);
+            }
+        });
+
+        // Subscribe
+        document.getElementById('subscribe').addEventListener('click', async () => {
+            const authToken = authTokenInput.value.trim();
+            if (!authToken) {
+                updateStatus('❌ Please enter auth token', true);
+                return;
+            }
+
+            try {
+                updateStatus('Subscribing...');
+                const token = await messaging.subscribe(authToken);
+                tokenDisplayEl.value = token;
+                updateStatus('✅ Subscribed successfully!');
+            } catch (error) {
+                updateStatus('❌ Error: ' + error.message, true);
+            }
+        });
+
+        // Unsubscribe
+        document.getElementById('unsubscribe').addEventListener('click', async () => {
+            const authToken = authTokenInput.value.trim();
+            if (!authToken) {
+                updateStatus('❌ Please enter auth token', true);
+                return;
+            }
+
+            try {
+                updateStatus('Unsubscribing...');
+                await messaging.unsubscribe(authToken);
+                tokenDisplayEl.value = '';
+                updateStatus('✅ Unsubscribed successfully!');
+            } catch (error) {
+                updateStatus('❌ Error: ' + error.message, true);
+            }
+        });
+
+        // Initialize on load
+        messaging.init().then(() => {
+            updateStatus('Firebase initialized - Ready!');
+        }).catch(error => {
+            updateStatus('❌ Initialization failed: ' + error.message, true);
+        });
+    </script>
+</body>
+</html>

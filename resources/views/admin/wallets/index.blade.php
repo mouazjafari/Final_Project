@@ -22,7 +22,7 @@
                 {{ __('admin.wallets_count') }}: {{ $wallets->count() }}
             </span>
             <span class="stat-badge">
-                {{ __('admin.balances') }}: {{ number_format($wallets->sum('balance'), 2) }} ₪
+                {{ __('admin.balances') }}: ${{ number_format($wallets->sum('balance'), 2) }}
             </span>
         </div>
     </div>
@@ -67,7 +67,7 @@
 
                 <div class="wallet-balance">
                     <div class="balance-label">{{ __('admin.current_balance') }}</div>
-                    <div class="balance-amount">{{ number_format($wallet->balance, 2) }} ₪</div>
+                    <div class="balance-amount">${{ number_format($wallet->balance, 2) }}</div>
                 </div>
 
                 @if ($wallet->transactions->count() > 0)
@@ -80,7 +80,7 @@
                                 </span>
                                 <span class="trans-amount">
                                     {{ $trans->type == 'deposit' ? '+' : '-' }}
-                                    {{ number_format($trans->amount, 2) }} ₪
+                                    ${{ number_format($trans->amount, 2) }}
                                 </span>
                                 <span class="trans-date">
                                     {{ $trans->created_at->diffForHumans() }}

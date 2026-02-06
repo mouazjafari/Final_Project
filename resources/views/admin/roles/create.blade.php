@@ -136,8 +136,8 @@
                 @if($permissions->count() === 0)
                     <div style="text-align: center; padding: 3rem; background: #f9fafb; border-radius: 12px; margin-top: 1rem;">
                         <div style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;">🔐</div>
-                        <h3 style="color: #6b7280;">لا توجد صلاحيات متاحة</h3>
-                        <p style="color: #9ca3af; margin-top: 0.5rem;">يرجى إنشاء صلاحيات أولاً</p>
+                        <h3 style="color: #6b7280;">{{ $isAr ? 'لا توجد صلاحيات متاحة' : 'No permissions available' }}</h3>
+                        <p style="color: #9ca3af; margin-top: 0.5rem;">{{ $isAr ? 'يرجى إنشاء صلاحيات أولاً' : 'Please create permissions first' }}</p>
                     </div>
                 @endif
             </div>
@@ -145,10 +145,10 @@
             <!-- Form Actions -->
             <div class="form-actions">
                 <button type="submit" class="btn-submit">
-                    💾 حفظ الدور
+                    💾 {{ $isAr ? 'حفظ الدور' : 'Save Role' }}
                 </button>
                 <a href="{{ route('admin.roles.index') }}" class="btn-cancel">
-                    ❌ إلغاء
+                    ❌ {{ $isAr ? 'إلغاء' : 'Cancel' }}
                 </a>
             </div>
         </form>

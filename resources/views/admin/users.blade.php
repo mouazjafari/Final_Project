@@ -106,12 +106,28 @@
 
                 <!-- User Actions -->
                 <div class="address-actions" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; justify-content: center;">
-                    @if(auth()->user()->hasPermissionTo('assign roles to users', 'web'))
+                    @php
+                        $isRegularUser = $u->roles->isNotEmpty() && $u->roles->first()->name === \App\Http\Enum\RoleUserEnum::User->value;
+                    @endphp
+
+                    @if(auth()->user()->hasPermissionTo('assign roles to users', 'web') && !$isRegularUser)
                         <a href="{{ route('admin.users.edit', $u->id) }}"
                            class="btn-action btn-edit"
                            style="background: #3498db; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 5px;">
                             ✏️ تعديل الدور
                         </a>
+                    @endif
+
+                    @if(auth()->user()->hasPermissionTo('create users', 'web') && $isRegularUser)
+                        <form action="{{ route('admin.users.toggleStatus', $u->id) }}" method="POST" style="margin: 0;">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit"
+                                    class="btn-action"
+                                    style="background: {{ $u->is_active ? '#27ae60' : '#e74c3c' }}; color: white; padding: 8px 15px; border-radius: 5px; border: none; cursor: pointer; font-size: 14px; display: inline-flex; align-items: center; gap: 5px;">
+                                {{ $u->is_active ? '✓ مفعّل' : '✗ معطّل' }}
+                            </button>
+                        </form>
                     @endif
                 </div>
             </div>

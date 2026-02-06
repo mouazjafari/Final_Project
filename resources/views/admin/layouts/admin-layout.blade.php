@@ -120,6 +120,63 @@
     <script src="{{ asset('js/translations.js') }}?v={{ time() }}"></script>
     <script src="{{ asset('js/admin-scripts_dashboard.js') }}?v={{ time() }}"></script>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+    <script src="{{ asset('js/firebase-config.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/firebase-messaging.js') }}?v={{ time() }}"></script>
+
+    <!-- Initialize Firebase Notifications -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Initialize Firebase Messaging
+                const firebaseMessaging = new FirebaseWebMessaging(firebaseConfig, '{{ url("/api") }}');
+                await firebaseMessaging.init();
+
+                // Request permission and get token
+                const hasPermission = await firebaseMessaging.requestPermission();
+                if (hasPermission) {
+                    const token = await firebaseMessaging.getToken();
+                    if (token) {
+                        // Send token to backend
+                        const response = await fetch('{{ route("admin.update-fcm-token") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            },
+                            body: JSON.stringify({ fcm_token: token })
+                        });
+
+                        if (response.ok) {
+                            console.log('✅ FCM token saved successfully');
+                        }
+                    }
+                }
+
+                // Handle foreground messages
+                firebaseMessaging.onMessage((payload) => {
+                    console.log('📩 Foreground message:', payload);
+
+                    // Show browser notification
+                    if (Notification.permission === 'granted') {
+                        new Notification(payload.notification?.title || 'New Notification', {
+                            body: payload.notification?.body || '',
+                            icon: '/images/notification-icon.png'
+                        });
+                    }
+
+                    // Refresh notification badge
+                    location.reload();
+                });
+
+            } catch (error) {
+                console.error('Firebase initialization error:', error);
+            }
+        });
+    </script>
+
     @stack('scripts')
 </body>
 
