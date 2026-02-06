@@ -34,9 +34,8 @@ class FcmTokenController extends Controller
     public function destroy(Request $request)
     {
         $user = Auth::user();
-        $user->fcm_token = null;
+        $user->fcm_token = null;;
         $user->save();
-
         return response()->json([
             'success' => true,
             'message' => 'FCM token removed successfully',
