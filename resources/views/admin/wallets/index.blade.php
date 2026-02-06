@@ -92,7 +92,7 @@
 
                 <div class="card-actions">
                     <a href="{{ route('admin.wallets.show', $wallet->user_id) }}" class="btn-view">
-                        👁️ {{ __('admin.view_details') }}
+                         {{ __('admin.view_details') }}
                     </a>
                 </div>
             </div>

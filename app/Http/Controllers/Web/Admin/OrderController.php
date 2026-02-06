@@ -25,7 +25,8 @@ class OrderController extends Controller
                 'address.city',
                 'designOrders.size',
                 'designOrders.design.images',
-                'designOrders.options' // ✅ هون المشكلة - كان معلق
+                'designOrders.options', // ✅ هون المشكلة - كان معلق
+                'review.user' // ✅ إضافة التقييمات
             ])->findOrFail($id);
 
             // تنسيق البيانات
@@ -116,6 +117,19 @@ class OrderController extends Controller
 
                     $orderData['designOrders'][] = $designData;
                 }
+            }
+
+            // ✅ معالجة التقييم
+            if ($order->review) {
+                $orderData['review'] = [
+                    'id' => $order->review->id,
+                    'rating' => $order->review->rating,
+                    'comment' => $order->review->comment,
+                    'user_name' => $order->review->user->name ?? 'مستخدم',
+                    'created_at' => $order->review->created_at->format('Y-m-d H:i'),
+                ];
+            } else {
+                $orderData['review'] = null;
             }
 
             return response()->json(['order' => $orderData]);

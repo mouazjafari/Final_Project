@@ -121,6 +121,9 @@ function showOrderDetails(orderId) {
                 </div>
                 ` : ''}
 
+                <!-- Review Section -->
+                ${generateOrderReviewHTML(order.review)}
+
                 <!-- Design Orders Section -->
                 <div style="background: #f9fafb; border-radius: 15px; padding: 2rem; border: 2px solid #e5e7eb;">
                     <h3 style="margin: 0 0 1.5rem 0; color: #1f2937; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
@@ -282,6 +285,49 @@ function showOrderDetails(orderId) {
                 </div>
             `;
         });
+}
+
+// ==================== Generate Order Review HTML ====================
+
+function generateOrderReviewHTML(review) {
+    if (!review) {
+        return ''; // لا نعرض شيء إذا لم يكن هناك تقييم
+    }
+
+    const stars = '⭐'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+
+    return `
+        <div style="background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; border: 2px solid #f59e0b; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);">
+            <div style="display: flex; align-items: start; gap: 1rem;">
+                <div style="font-size: 2.5rem;">⭐</div>
+                <div style="flex: 1;">
+                    <h4 style="margin: 0 0 1rem 0; color: #92400e; font-weight: 700; font-size: 1.3rem; display: flex; align-items: center; gap: 0.5rem;">
+                        تقييم الطلب
+                        <span style="font-size: 1.5rem;">${stars}</span>
+                    </h4>
+
+                    <div style="background: white; border-radius: 10px; padding: 1rem; margin-bottom: 0.8rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <span style="font-size: 1.2rem;">👤</span>
+                            <span style="color: #92400e; font-weight: 600;">${review.user_name}</span>
+                            <span style="color: #a16207; font-size: 0.85rem; margin-right: auto;">📅 ${review.created_at}</span>
+                        </div>
+                        ${review.comment ? `
+                            <div style="color: #78350f; line-height: 1.6; padding: 0.5rem 0; border-top: 1px solid #fde68a; margin-top: 0.5rem; padding-top: 0.8rem;">
+                                <span style="font-style: italic;">"${review.comment}"</span>
+                            </div>
+                        ` : '<div style="color: #a16207; font-style: italic; font-size: 0.9rem;">لا يوجد تعليق</div>'}
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; font-size: 0.85rem; color: #92400e;">
+                        <span style="background: white; padding: 0.4rem 0.8rem; border-radius: 20px; font-weight: 600;">
+                            التقييم: ${review.rating}/5
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 // ==================== Close Order Modal ====================

@@ -44,11 +44,21 @@ function closeDeleteModal() {
 // ==================== Permission Modals ====================
 
 function openAddModal() {
-    document.getElementById('addModal').style.display = 'block';
+    const addModal = document.getElementById('addModal');
+    if (!addModal) {
+        return;
+    }
+
+    addModal.style.display = 'block';
 }
 
 function closeAddModal() {
-    document.getElementById('addModal').style.display = 'none';
+    const addModal = document.getElementById('addModal');
+    if (!addModal) {
+        return;
+    }
+
+    addModal.style.display = 'none';
 }
 
 function confirmDeletePermission(id, name) {

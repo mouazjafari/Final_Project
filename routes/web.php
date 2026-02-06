@@ -151,7 +151,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
         Route::prefix('permissions')->name('permissions.')->group(function () {
             Route::get('/', [PermissionController::class, 'index'])->name('index');
-            Route::post('/', [PermissionController::class, 'store'])->name('store');
             Route::delete('/{id}', [PermissionController::class, 'destroy'])->name('destroy');
         });
 

@@ -15,6 +15,7 @@ class CouponUsage extends Model
 
     protected $casts = [
         'discount_amount' => 'decimal:2',
+        'created_at' => 'datetime', // ✅ إضافة cast لـ created_at
     ];
 
     public $timestamps = false; // نستخدم created_at فقط

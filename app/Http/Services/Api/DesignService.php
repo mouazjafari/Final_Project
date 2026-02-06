@@ -113,7 +113,7 @@ class DesignService
                 foreach ($admins as $admin) {
                     $admin->notify(new DesignCreatedNotification($design));
                 }
-
+                $design->load(['sizes', 'designOptions', 'images', 'user']);
                 return $design;
             } catch (\Exception $e) {
                 Log::error('Error creating design: ' . $e->getMessage());

@@ -19,9 +19,6 @@
         <h2>{{ __('admin.permissions_management') }}</h2>
         <div class="page-stats">
             <span class="stat-badge">{{ __('admin.total') }}: {{ $permissions->count() }}</span>
-            <button class="btn-add" onclick="openAddModal()">
-                {{ __('admin.add_new_permission') }}
-            </button>
         </div>
     </div>
 
@@ -98,49 +95,9 @@
         <div class="empty-state">
             <div class="empty-icon">🔐</div>
             <h3>لا توجد صلاحيات حالياً</h3>
-            <p>ابدأ بإنشاء أول صلاحية!</p>
-            <button class="btn-add" onclick="openAddModal()">
-                ➕ إضافة صلاحية جديدة
-            </button>
+            <p>لا توجد صلاحيات لعرضها حالياً.</p>
         </div>
     @endif
-
-    <!-- Add Permission Modal -->
-    <div id="addModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>➕ إضافة صلاحية جديدة</h3>
-                <span class="close" onclick="closeAddModal()">&times;</span>
-            </div>
-            <form action="{{ route('admin.permissions.store') }}" method="POST">
-                @csrf
-                <div class="form-group">
-                    <label for="permission_name">اسم الصلاحية *</label>
-                    <input type="text"
-                           name="name"
-                           id="permission_name"
-                           placeholder="مثال: create posts"
-                           required
-                           maxlength="100">
-                    <small>استخدم أحرف صغيرة بدون مسافات (يمكن استخدام _)</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="permission_guard">Guard Name *</label>
-                    <select name="guard_name" id="permission_guard" required>
-                        <option value="">اختر Guard</option>
-                        <option value="api">🔌 API</option>
-                        <option value="web">🌐 WEB</option>
-                    </select>
-                </div>
-
-                <div class="modal-actions">
-                    <button type="submit" class="btn-submit">💾 حفظ</button>
-                    <button type="button" class="btn-cancel" onclick="closeAddModal()">❌ إلغاء</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <!-- Delete Permission Modal -->
     <div id="deletePermissionModal" class="modal">

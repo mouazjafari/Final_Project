@@ -7,7 +7,6 @@ use App\Http\Enum\OrderStatusEnum;
 use App\Models\Address;
 use App\Models\Design;
 use App\Models\Order;
-use App\Models\User;
 use App\Notifications\OrderCreatedNotification;
 use App\Notifications\OrderStatusUpdatedNotification;
 use Illuminate\Support\Facades\Auth;
@@ -48,7 +47,7 @@ class OrderService
                     $order = Order::create([
                         'user_id' => Auth::id(),
                         'address_id' => $data['address_id'],
-                        'notes' => $data['notes'],
+                        'notes' => $data['notes'] ?? null,
                         'total_price' => 0,
                         'status' => OrderStatusEnum::Pending
                     ]);
@@ -71,16 +70,34 @@ class OrderService
                     );
                 }
 
-                $existingDesign = $order->design()
+                // ✅ فحص معدّل: السماح بنفس التصميم والمقاس لكن بخيارات مختلفة
+                $existingDesignOrders = DB::table('design_order')
+                    ->where('order_id', $order->id)
                     ->where('design_id', $data['design_id'])
-                    ->wherePivot('size_id', $data['size_id'])
-                    ->first();
+                    ->where('size_id', $data['size_id'])
+                    ->get();
 
-                if ($existingDesign) {
-                    throw new GeneralException(
-                        'This design is already exists in your order',
-                        403
-                    );
+                if ($existingDesignOrders->isNotEmpty()) {
+                    // التحقق من الخيارات المطلوب إضافتها
+                    $requestedOptions = collect($data['options'])->sort()->values()->all();
+
+                    foreach ($existingDesignOrders as $existingOrder) {
+                        // جلب الخيارات المختارة للتصميم الموجود
+                        $existingOptions = DB::table('design_option_selected')
+                            ->where('design_order_id', $existingOrder->id)
+                            ->pluck('design_option_id')
+                            ->sort()
+                            ->values()
+                            ->all();
+
+                        // إذا كانت الخيارات متطابقة تماماً
+                        if ($requestedOptions == $existingOptions) {
+                            throw new GeneralException(
+                                'This design with the same size and options already exists in your order. Please choose different options or update the existing item.',
+                                403
+                            );
+                        }
+                    }
                 }
 
                 // إضافة التصميم للطلب
@@ -226,20 +243,48 @@ class OrderService
                     );
                 }
 
-                // التحقق من تكرار نفس التصميم بنفس المقاس (إذا تم تغيير المقاس)
-                if (isset($data['size_id']) && $data['size_id'] != $designOrder->size_id) {
-                    $existingDesign = DB::table('design_order')
+                // ✅ التحقق المعدل: السماح بنفس التصميم والمقاس لكن بخيارات مختلفة
+                $newSizeId = $data['size_id'] ?? $designOrder->size_id;
+                $newOptions = $data['options'] ?? null;
+
+                // إذا تم تغيير المقاس أو الخيارات، نتحقق من عدم التكرار
+                if (($newSizeId != $designOrder->size_id) || $newOptions !== null) {
+                    // جلب التصاميم الموجودة بنفس الـ design_id و size_id
+                    $existingDesignOrders = DB::table('design_order')
                         ->where('order_id', $order->id)
                         ->where('design_id', $designOrder->design_id)
-                        ->where('size_id', $data['size_id'])
+                        ->where('size_id', $newSizeId)
                         ->where('id', '!=', $designOrderId)
-                        ->exists();
+                        ->get();
 
-                    if ($existingDesign) {
-                        throw new GeneralException(
-                            'This design with the same size already exists in your order',
-                            403
-                        );
+                    if ($existingDesignOrders->isNotEmpty()) {
+                        // الخيارات الجديدة (إذا لم يتم إرسالها، نستخدم الخيارات الحالية)
+                        if ($newOptions === null) {
+                            $newOptions = DB::table('design_option_selected')
+                                ->where('design_order_id', $designOrderId)
+                                ->pluck('design_option_id')
+                                ->toArray();
+                        }
+
+                        $requestedOptions = collect($newOptions)->sort()->values()->all();
+
+                        foreach ($existingDesignOrders as $existingOrder) {
+                            // جلب الخيارات المختارة للتصميم الموجود
+                            $existingOptions = DB::table('design_option_selected')
+                                ->where('design_order_id', $existingOrder->id)
+                                ->pluck('design_option_id')
+                                ->sort()
+                                ->values()
+                                ->all();
+
+                            // إذا كانت الخيارات متطابقة تماماً
+                            if ($requestedOptions == $existingOptions) {
+                                throw new GeneralException(
+                                    'This design with the same size and options already exists in your order. Please choose different options.',
+                                    403
+                                );
+                            }
+                        }
                     }
                 }
 

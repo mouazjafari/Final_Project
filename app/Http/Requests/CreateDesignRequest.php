@@ -83,7 +83,7 @@ class CreateDesignRequest extends FormRequest
 
             // خلي images optional تماماً
             'images' => 'sometimes|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif'
+            'images.*' => 'image'
         ];
     }
 
