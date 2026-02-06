@@ -318,13 +318,65 @@ class OrderService
 
     public function cancelOrder($order)
     {
-        $oldStatus = $order->status;
-        $order->status = OrderStatusEnum::Cancelled;
-        $order->save();
+        return DB::transaction(function () use ($order) {
+            $oldStatus = $order->status;
 
-        // إرسال إشعار بتحديث حالة الطلب
-        $order->user->notify(new OrderStatusUpdatedNotification($order, $oldStatus));
+            // التحقق من أن الطلب قابل للإلغاء (pending أو processing فقط)
+            if (!in_array($order->status, [OrderStatusEnum::Pending->value, OrderStatusEnum::Processing->value])) {
+                throw new GeneralException(
+                    'This order cannot be cancelled. Only pending or processing orders can be cancelled.',
+                    403
+                );
+            }
 
-        return $order;
+            // إذا كانت الحالة processing، يتم إرجاع المبلغ للمحفظة
+            if ($order->status === OrderStatusEnum::Processing->value) {
+                // جلب الدفعة المكتملة
+                $payment = $order->payments()
+                    ->where('status', 'completed')
+                    ->first();
+
+                Log::info('Checking refund', [
+                    'order_id' => $order->id,
+                    'order_status' => $order->status,
+                    'payment' => $payment ? $payment->toArray() : null,
+                ]);
+
+                if ($payment) {
+                    // جلب محفظة المستخدم
+                    $wallet = $order->user->wallet;
+
+                    if ($wallet) {
+                        // إرجاع المبلغ للمحفظة
+                        $wallet->deposit([
+                            'amount' => $payment->amount,
+                            'notes' => 'Refund for cancelled order #' . $order->id,
+                        ]);
+
+                        // تحديث حالة الدفعة إلى refunded
+                        $payment->update(['status' => 'refunded']);
+
+                        Log::info('Order refunded to wallet', [
+                            'order_id' => $order->id,
+                            'amount' => $payment->amount,
+                            'user_id' => $order->user_id,
+                        ]);
+                    } else {
+                        Log::warning('User has no wallet', ['user_id' => $order->user_id]);
+                    }
+                } else {
+                    Log::warning('No completed payment found for order', ['order_id' => $order->id]);
+                }
+            }
+
+            // تحديث حالة الطلب إلى ملغي
+            $order->status = OrderStatusEnum::Cancelled;
+            $order->save();
+
+            // إرسال إشعار بتحديث حالة الطلب
+            $order->user->notify(new OrderStatusUpdatedNotification($order, $oldStatus));
+
+            return $order;
+        });
     }
 }

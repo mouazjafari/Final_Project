@@ -139,8 +139,35 @@ class OrderController extends Controller
                 'status' => 'required|in:pending,processing,completed,cancelled'
             ]);
 
-            $order = Order::findOrFail($id);
-            $order->status = $request->status;
+            $order = Order::with(['user.wallet', 'payments'])->findOrFail($id);
+            $oldStatus = $order->status;
+            $newStatus = $request->status;
+
+            // إذا كانت الحالة القديمة processing والجديدة cancelled، يتم إرجاع المبلغ للمحفظة
+            if ($oldStatus === 'processing' && $newStatus === 'cancelled') {
+                $payment = $order->payments()
+                    ->where('status', 'completed')
+                    ->first();
+
+                if ($payment && $order->user->wallet) {
+                    // إرجاع المبلغ للمحفظة
+                    $order->user->wallet->deposit([
+                        'amount' => $payment->amount,
+                        'notes' => 'Refund for cancelled order #' . $order->id . ' (by admin)',
+                    ]);
+
+                    // تحديث حالة الدفعة إلى refunded
+                    $payment->update(['status' => 'refunded']);
+
+                    Log::info('Order refunded to wallet by admin', [
+                        'order_id' => $order->id,
+                        'amount' => $payment->amount,
+                        'user_id' => $order->user_id,
+                    ]);
+                }
+            }
+
+            $order->status = $newStatus;
             $order->save();
 
             return response()->json([

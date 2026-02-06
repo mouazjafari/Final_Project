@@ -28,7 +28,7 @@ class DesignController extends Controller
     }
     public function getDesignDetails($id)
     {
-        $design = Design::with(['user', 'sizes', 'designOptions'])->findOrFail($id);
+        $design = Design::with(['user', 'sizes', 'designOptions', 'images'])->findOrFail($id);
 
         $designName = is_string($design->name) ? json_decode($design->name, true) : $design->name;
         $displayDesignName = is_array($designName) ? ($designName['ar'] ?? $designName['en'] ?? 'غير محدد') : $design->name;
@@ -42,12 +42,19 @@ class DesignController extends Controller
             ];
         });
 
+        // معالجة الصور
+        $images = $design->images->map(function ($image) {
+            return [
+                'image_path' => $image->image_path
+            ];
+        });
+
         return response()->json([
             'id' => $design->id,
             'name' => $displayDesignName,
             'description' => $displayDesignDescription,
             'user_name' => $design->user->name,
-            'image' => $design->image,
+            'images' => $images,
             'price' => number_format($design->price, 2),
             'sizes' => $sizes,
             'colors' => $design->designOptions->where('type', 'color')->map(fn($item) => ['name' => $item->getTranslation('name', 'ar')])->values(),

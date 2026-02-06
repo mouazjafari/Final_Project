@@ -20,6 +20,11 @@ function showOrderDetails(orderId) {
         })
         .then(data => {
             const order = data.order;
+            console.log('Order data:', order);
+            console.log('Design orders:', order.designOrders);
+            if (order.designOrders && order.designOrders.length > 0) {
+                console.log('First design images:', order.designOrders[0].design_images);
+            }
 
             const statusConfig = {
                 'pending': { text: __('orderStatus.pending'), icon: '⏳', color: '#f59e0b', bg: '#fef3c7' },
